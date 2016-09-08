@@ -11,5 +11,10 @@
 from copy import deepcopy, copy
 import os
 
-from kippo.kippo.core import honeypot
+from kippo.kippo.core import fs
+from kippo.kippo.core.config import config
+import kippo.kippo.core.exceptions
+from kippo.kippo import core
+
+
 
