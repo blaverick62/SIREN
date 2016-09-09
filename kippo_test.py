@@ -7,11 +7,12 @@
 # integrated into the HIVE Project after testing is        #
 # complete.                                                #
 #########################################################
-import subprocess, os
+import subprocess, sys, os
 
 def knode_start():
-    print("Starting new kippo node...")
-    subprocess.call(['./kippo/pystart.sh'])
+    os.chdir('kippo')
+    subprocess.call(['./pystart.sh'])
+    os.chdir('..')
 
 knode_start()
 
