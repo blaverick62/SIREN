@@ -9,8 +9,8 @@
 #########################################################
 import subprocess, os
 
-currdir = os.getcwd()
-os.chdir("kippo")
-subprocess.call(['./pystart.sh'])
-os.chdir("..")
+def knode_start():
+    print("Starting new kippo node...")
+    subprocess.call(['./kippo/pystart.sh'])
+
 
