@@ -7,14 +7,10 @@
 # integrated into the HIVE Project after testing is        #
 # complete.                                                #
 #########################################################
+import subprocess, os
 
-from copy import deepcopy, copy
-import os
-
-from kippo.kippo.core import fs
-from kippo.kippo.core.config import config
-import kippo.kippo.core.exceptions
-from kippo.kippo import core
-
-
+currdir = os.getcwd()
+os.chdir("kippo")
+subprocess.call(['./pystart.sh'])
+os.chdir("..")
 
