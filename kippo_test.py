@@ -13,4 +13,7 @@ def knode_start():
     print("Starting new kippo node...")
     subprocess.call(['./kippo/pystart.sh'])
 
+knode_start()
+
+
 
