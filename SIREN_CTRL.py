@@ -10,7 +10,7 @@
 # and can record data on the attacker.                      #
 #############################################################
 
-from thread import *
+import threading
 from SIREN_SERVERS import *
 
 import subprocess, sys, os, socket
@@ -22,7 +22,11 @@ def knode_start():
 
 def main():
     http_thread = http_ctrl()
-    start_new_thread(http_thread.http_bind, ())
+    ftp_thread = ftp_ctrl()
+    httpth = http_thread.http_bind()
+    httpth.start()
+    ftpth = ftp_thread.run()
+    ftpth.start()
 
 while 1:
     pass
