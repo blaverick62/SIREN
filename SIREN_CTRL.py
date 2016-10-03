@@ -11,7 +11,8 @@
 #############################################################
 
 import threading
-from SIREN_SERVERS import *
+from ftp_server import *
+from http_server import *
 
 import subprocess, sys, os, socket
 
@@ -23,13 +24,16 @@ def knode_start():
 def main():
     http_thread = http_ctrl()
     ftp_thread = ftp_ctrl()
-    httpth = http_thread.http_bind()
-    httpth.start()
-    ftpth = ftp_thread.run()
-    ftpth.start()
+    http_thread.start()
+    ftp_thread.start()
 
-while 1:
-    pass
+    while 1:
+        if sys.stdin == "exit":
+            break
+
+
+
+
 
 if __name__ == "__main__":
     main()
