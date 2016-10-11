@@ -7,7 +7,7 @@
 # servers that SIREN implements.                            #
 #############################################################
 
-import socket, threading, os, time
+import socket, threading, os, time, sys
 
 
 class FTPserverThread(threading.Thread):
@@ -65,7 +65,9 @@ class FTPserverThread(threading.Thread):
         #else:
         #    cwd='/'+cwd
         #self.conn.send('257 \"%s\"\r\n' % cwd)
-        pass
+        print('PWD Received')
+        self.conn.send('ACK PWD COMMAND')
+
     def CWD(self,cmd):
         #chwd=cmd[4:-2]
         #if chwd=='/':
@@ -142,7 +144,8 @@ class FTPserverThread(threading.Thread):
         #    self.conn.send('250 Directory deleted.\r\n')
         #else:
         #    self.conn.send('450 Not allowed.\r\n')
-        pass
+        print('RMD Received')
+        self.conn.send('ACK RMD COMMAND')
 
     def DELE(self,cmd):
         #fn=os.path.join(self.cwd,cmd[5:-2])
@@ -151,12 +154,14 @@ class FTPserverThread(threading.Thread):
         #    self.conn.send('250 File deleted.\r\n')
         #else:
         #    self.conn.send('450 Not allowed.\r\n')
-        pass
+        print('DELE Received')
+        self.conn.send('ACK DELE COMMAND')
 
     def RNFR(self,cmd):
         #self.rnfn=os.path.join(self.cwd,cmd[5:-2])
         #self.conn.send('350 Ready.\r\n')
-        pass
+        print('RNFR Received')
+        self.conn.send('ACK RNFR COMMAND')
 
     def RNTO(self,cmd):
         #fn=os.path.join(self.cwd,cmd[5:-2])
@@ -211,13 +216,18 @@ class ftp_ctrl(threading.Thread):
         Control server for the HTTP Protocol server
     """
     def __init__(self):
-        self.ctlPort = 21
+        self.ctlPort = 4021
         self.buff = 4096
         self.ctlSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.ctlSock.bind(socket.gethostname(), self.ctlPort)
+        try:
+            print('Starting FTP Server...')
+            self.ctlSock.bind((socket.gethostname(), self.ctlPort))
+        except Exception as e:
+            print('FTP Server could not bind')
+            sys.exit()
         threading.Thread.__init__(self)
 
-    def ftp_run(self):
+    def run(self):
         self.ctlSock.listen(5)
         while 1:
             th = FTPserverThread(self.ctlSock.accept())

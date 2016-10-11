@@ -23,16 +23,19 @@ def knode_start():
 
 def main():
     http_thread = http_ctrl()
+    http_thread.setDaemon(True)
+
     ftp_thread = ftp_ctrl()
+    ftp_thread.setDaemon(True)
+    
     http_thread.start()
     ftp_thread.start()
 
     while 1:
         if sys.stdin == "exit":
+            http_thread.stop()
+            ftp_thread.ftp_stop()
             break
-
-
-
 
 
 if __name__ == "__main__":
