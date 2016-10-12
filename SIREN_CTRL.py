@@ -21,20 +21,31 @@ def knode_start():
     subprocess.call(['./pystart.sh'])
     os.chdir('..')
 
-def main():
-    http_thread = http_ctrl()
-    http_thread.setDaemon(True)
+def knode_stop():
+    os.chdir('kippo')
+    subprocess.call(['./stop.sh'])
+    os.chdir('..')
 
-    ftp_thread = ftp_ctrl()
-    ftp_thread.setDaemon(True)
-    
-    http_thread.start()
-    ftp_thread.start()
+def main():
+    #http_thread = http_ctrl()
+    #http_thread.setDaemon(True)
+
+    #ftp_thread = ftp_ctrl()
+    #ftp_thread.setDaemon(True)
+
+    try:
+        knode_start()
+    except (KeyboardInterrupt, SystemExit):
+        knode_stop()
+        sys.exit()
+    #http_thread.start()
+    #ftp_thread.start()
 
     while 1:
         if sys.stdin == "exit":
-            http_thread.stop()
-            ftp_thread.ftp_stop()
+            #http_thread.stop()
+            #ftp_thread.ftp_stop()
+            knode_stop()
             break
 
 
