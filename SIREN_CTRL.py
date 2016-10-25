@@ -11,15 +11,20 @@
 #############################################################
 
 import threading
-from ftp_server import *
-from http_server import *
+from server.ftp_server import *
+from server.http_server import *
+from server.telnet_server import *
 
 import subprocess, sys, os, socket
 
+# Clean up kippo exit
 def knode_start():
     os.chdir('kippo')
-    subprocess.call(['./pystart.sh'])
+    print("Starting Kippo Honeypot...")
+    kipStart = "twistd -y kippo.tac -l log/kippo.log --pidfile kippo.pid"
+    subprocess.Popen(kipStart.split())
     os.chdir('..')
+    print("Kippo Running in Background...")
 
 def knode_stop():
     os.chdir('kippo')
@@ -27,25 +32,35 @@ def knode_stop():
     os.chdir('..')
 
 def main():
-    #http_thread = http_ctrl()
-    #http_thread.setDaemon(True)
 
-    #ftp_thread = ftp_ctrl()
-    #ftp_thread.setDaemon(True)
+    # http_thread = http_ctrl()
+    # http_thread.setDaemon(True)
+
+    # ftp_thread = ftp_ctrl()
+    # ftp_thread.setDaemon(True)
+
+    #telnet_thread = telnet_ctrl()
+    #telnet_thread.setDaemon(True)
 
     try:
         knode_start()
-    except (KeyboardInterrupt, SystemExit):
-        knode_stop()
+        # http_thread.start()
+        # ftp_thread.start()
+        #telnet_thread.start()
+    except KeyboardInterrupt:
+        # http_thread.stop()
+        # ftp_thread.stop()
+        #telnet_thread.stop()
+        #knode_stop()
         sys.exit()
-    #http_thread.start()
-    #ftp_thread.start()
+
 
     while 1:
         if sys.stdin == "exit":
             #http_thread.stop()
-            #ftp_thread.ftp_stop()
-            knode_stop()
+            #ftp_thread.stop()
+            #telnet_thread.stop()
+            #knode_stop()
             break
 
 

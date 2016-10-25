@@ -233,5 +233,5 @@ class ftp_ctrl(threading.Thread):
             th = FTPserverThread(self.ctlSock.accept())
             th.start()
 
-    def ftp_stop(self):
+    def stop(self):
         self.ctlSock.close()
