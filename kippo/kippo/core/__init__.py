@@ -1,2 +1,3 @@
 from . import auth
-from . import config
+from .config import config
+

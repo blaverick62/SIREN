@@ -8,7 +8,7 @@ from twisted.cred import checkers, credentials, error
 from twisted.internet import defer
 from zope.interface import implements
 
-from kippo.core.config import config
+from config import config
 
 # by Walter de Jong <walter@sara.nl>
 class UserDB(object):
