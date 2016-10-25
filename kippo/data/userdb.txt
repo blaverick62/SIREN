@@ -1,1 +1,2 @@
-root:0:123456
+root:0:password123
+guest:0:password
