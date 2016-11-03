@@ -11,9 +11,7 @@
 #############################################################
 
 import threading
-from server.ftp_server import *
-from server.http_server import *
-from server.telnet_server import *
+from server.base import base
 from detonation import detChamber
 
 import subprocess, sys, os, socket
@@ -33,47 +31,21 @@ def knode_stop():
     os.chdir('..')
 
 def main():
-    dets = -1
 
-    while (dets < 0):
-        dets = input("How many detonation chambers would you like to connect? >> ")
+    linaddr = input("What is the IP address of the Linux Detonation Chamber? >> ")
+    winaddr = input("What is the IP address of the Windows Detonation Chamber? >> ")
 
-    linList = []
-    winList = []
+    linDet = detChamber(linaddr)
+    winDet = detChamber(winaddr)
 
-    if (dets > 0):
-        for i in range(dets):
-            detaddr = input("What is the IP Address of this chamber? >>")
-            dettype = input("What type is this detonation chamber? Y for Linux/OSX or N for Windows >>").upper()
+    siren_server = base(winDet, linDet)
 
-            if (dettype == 'Y'):
-                dettype = True
-            else:
-                dettype = False
-
-            if (dettype == True):
-                linList.append(detaddr)
-            else:
-                winList.append(detaddr)
-
-    # http_thread = http_ctrl()
-    # http_thread.setDaemon(True)
-
-    # ftp_thread = ftp_ctrl()
-    # ftp_thread.setDaemon(True)
-
-    #telnet_thread = telnet_ctrl()
-    #telnet_thread.setDaemon(True)
 
     try:
         knode_start()
-        # http_thread.start()
-        # ftp_thread.start()
-        #telnet_thread.start()
+        siren_server.start()
     except KeyboardInterrupt:
-        # http_thread.stop()
-        # ftp_thread.stop()
-        #telnet_thread.stop()
+        siren_server.start()
         #knode_stop()
         sys.exit()
 
