@@ -40,11 +40,11 @@ def main():
     config.write(winaddr + '\n')
     config.close()
 
-    http_thread = http_ctrl()
-    http_thread.setDaemon(True)
+    #http_thread = http_ctrl()
+    #http_thread.setDaemon(True)
 
-    ftp_thread = ftp_ctrl()
-    ftp_thread.setDaemon(True)
+    #ftp_thread = ftp_ctrl()
+    #ftp_thread.setDaemon(True)
 
     telnet_thread = telnet_ctrl()
     telnet_thread.setDaemon(True)
@@ -53,13 +53,13 @@ def main():
 
 
     try:
-        knode_start()
-        http_thread.start()
-        ftp_thread.start()
+        #knode_start()
+        #http_thread.start()
+        #ftp_thread.start()
         telnet_thread.start()
     except KeyboardInterrupt:
-        http_thread.stop()
-        ftp_thread.stop()
+        #http_thread.stop()
+        #ftp_thread.stop()
         telnet_thread.stop()
         #knode_stop()
         sys.exit()
@@ -67,8 +67,8 @@ def main():
 
     while 1:
         if sys.stdin == "exit":
-            http_thread.stop()
-            ftp_thread.stop()
+            #http_thread.stop()
+            #ftp_thread.stop()
             telnet_thread.stop()
             #knode_stop()
             break

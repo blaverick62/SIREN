@@ -10,16 +10,22 @@
 import socket, threading, sys
 
 class telnetServerThread(threading.Thread):
-    def __init__(self,(conn,addr)):
+    def __init__(self,(conn,addr), linaddr, winaddr):
         self.conn=conn
         self.addr=addr
         threading.Thread.__init__(self)
+        self.winsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.winconn = self.winsock.connect((winaddr, 23))
+        self.linconn = self.linsock.connect((linaddr, 23))
 
     def run(self):
 
         while True:
             data = self.conn.recv(256)
             print(data)
+            self.winconn.sendall(data)
+            self.linconn.sendall(data)
             self.conn.send(b'Message received fam!\r\n')
 
 
@@ -31,6 +37,10 @@ class telnet_ctrl(threading.Thread):
         self.port = 2023
         self.buff = 4096
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        detaddrs = open("../siren.config", 'r')
+        self.linaddr = detaddrs.readline()
+        self.winaddr = detaddrs.readline()
+        detaddrs.close()
         try:
             print("Starting Telnet Server...")
             self.sock.bind((socket.gethostname(), self.port))
@@ -43,7 +53,7 @@ class telnet_ctrl(threading.Thread):
     def run(self):
         self.sock.listen(5)
         while 1:
-            th = telnetServerThread(self.sock.accept())
+            th = telnetServerThread(self.sock.accept(), self.linaddr, self.winaddr)
             th.start()
             pass
 
