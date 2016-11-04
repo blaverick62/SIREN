@@ -11,10 +11,12 @@
 #############################################################
 
 import threading
-from server.base import base
-from detonation import detChamber
+from server.http_server import *
+from server.ftp_server import *
+from server.telnet_server import *
 
-import subprocess, sys, os, socket
+
+import subprocess, sys, os
 
 # Clean up kippo exit
 def knode_start():
@@ -31,30 +33,43 @@ def knode_stop():
     os.chdir('..')
 
 def main():
+    config = open("siren.config", mode='a')
+    linaddr = str(raw_input("What is the IP address of the Linux Detonation Chamber? >> "))
+    config.write(linaddr + '\n')
+    winaddr = str(raw_input("What is the IP address of the Windows Detonation Chamber? >> "))
+    config.write(winaddr + '\n')
+    config.close()
 
-    linaddr = input("What is the IP address of the Linux Detonation Chamber? >> ")
-    winaddr = input("What is the IP address of the Windows Detonation Chamber? >> ")
+    http_thread = http_ctrl()
+    http_thread.setDaemon(True)
 
-    linDet = detChamber(linaddr)
-    winDet = detChamber(winaddr)
+    ftp_thread = ftp_ctrl()
+    ftp_thread.setDaemon(True)
 
-    siren_server = base(winDet, linDet)
+    telnet_thread = telnet_ctrl()
+    telnet_thread.setDaemon(True)
+
+
 
 
     try:
         knode_start()
-        siren_server.start()
+        http_thread.start()
+        ftp_thread.start()
+        telnet_thread.start()
     except KeyboardInterrupt:
-        siren_server.start()
+        http_thread.stop()
+        ftp_thread.stop()
+        telnet_thread.stop()
         #knode_stop()
         sys.exit()
 
 
     while 1:
         if sys.stdin == "exit":
-            #http_thread.stop()
-            #ftp_thread.stop()
-            #telnet_thread.stop()
+            http_thread.stop()
+            ftp_thread.stop()
+            telnet_thread.stop()
             #knode_stop()
             break
 

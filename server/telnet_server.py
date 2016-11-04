@@ -8,7 +8,6 @@
 #############################################################
 
 import socket, threading, sys
-from base import base
 
 class telnetServerThread(threading.Thread):
     def __init__(self,(conn,addr)):
@@ -24,7 +23,7 @@ class telnetServerThread(threading.Thread):
             self.conn.send(b'Message received fam!\r\n')
 
 
-class telnet_ctrl(base, threading.Thread):
+class telnet_ctrl(threading.Thread):
     """
         Control server for the HTTP Protocol server
     """
@@ -40,7 +39,6 @@ class telnet_ctrl(base, threading.Thread):
             sys.exit()
 
         threading.Thread.__init__(self)
-        base.__init__(self, winDet=super, linDet=super)
 
     def run(self):
         self.sock.listen(5)

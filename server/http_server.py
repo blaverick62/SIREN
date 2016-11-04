@@ -8,15 +8,11 @@
 #############################################################
 
 import socket, threading, sys
-from base import base
-from detonation.det_routes import *
 
 class HTTPserverThread(threading.Thread):
-    def __init__(self,(conn,addr),lindetconn,windetconn):
+    def __init__(self,(conn,addr)):
         self.conn=conn
         self.addr=addr
-        self.lindetconn = lindetconn
-        self.windetconn = windetconn
         threading.Thread.__init__(self)
 
     def run(self):
@@ -25,10 +21,9 @@ class HTTPserverThread(threading.Thread):
             data = self.conn.recv(256)
             print(data)
             self.conn.send(b'Message received fam!\r\n')
-            self.lindetconn.sendall(data)
 
 
-class http_ctrl(base, threading.Thread):
+class http_ctrl(threading.Thread):
     """
         Control server for the HTTP Protocol server
     """
@@ -44,12 +39,11 @@ class http_ctrl(base, threading.Thread):
             sys.exit()
 
         threading.Thread.__init__(self)
-        base.__init__(self, winDet=super, linDet=super)
 
     def run(self):
         self.sock.listen(5)
         while 1:
-            th = HTTPserverThread(self.sock.accept(), self.linDet.httpconn, self.winDet.httpconn)
+            th = HTTPserverThread(self.sock.accept())
             th.start()
             pass
 

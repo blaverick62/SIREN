@@ -8,7 +8,7 @@
 #############################################################
 
 import socket, threading, os, time, sys
-from base import base
+
 
 
 class FTPserverThread(threading.Thread):
@@ -212,7 +212,7 @@ class FTPserverThread(threading.Thread):
         self.stop_datasock()
         self.conn.send('226 Transfer complete.\r\n')
 
-class ftp_ctrl(base, threading.Thread):
+class ftp_ctrl(threading.Thread):
     """
         Control server for the HTTP Protocol server
     """
@@ -227,7 +227,6 @@ class ftp_ctrl(base, threading.Thread):
             print('FTP Server could not bind')
             sys.exit()
         threading.Thread.__init__(self)
-        base.__init__(self, winDet=super, linDet=super)
 
     def run(self):
         self.ctlSock.listen(5)
