@@ -7,7 +7,7 @@
 # servers that SIREN implements.                            #
 #############################################################
 
-import socket, threading, sys
+import socket, threading, sys, os
 
 class telnetServerThread(threading.Thread):
     def __init__(self,(conn,addr), linaddr, winaddr):
@@ -37,7 +37,7 @@ class telnet_ctrl(threading.Thread):
         self.port = 2023
         self.buff = 4096
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        detaddrs = open("../siren.config", 'r')
+        detaddrs = open("siren.config", mode="r")
         self.linaddr = detaddrs.readline()
         self.winaddr = detaddrs.readline()
         detaddrs.close()
