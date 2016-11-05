@@ -14,17 +14,18 @@ class telnetServerThread(threading.Thread):
         self.conn=conn
         self.addr=addr
         threading.Thread.__init__(self)
-        self.winsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #self.winsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.winconn = self.winsock.connect((winaddr, 23))
-        self.linconn = self.linsock.connect((linaddr, 23))
+        #self.winconn = self.winsock.connect((winaddr, 23))
+        print(linaddr)
+        self.linconn = self.linsock.connect((linaddr, 1234))
 
     def run(self):
 
         while True:
             data = self.conn.recv(256)
             print(data)
-            self.winconn.sendall(data)
+            #self.winconn.sendall(data)
             self.linconn.sendall(data)
             self.conn.send(b'Message received fam!\r\n')
 

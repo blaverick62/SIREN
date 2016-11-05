@@ -36,7 +36,8 @@ def main():
     config = open("siren.config", mode='a')
     linaddr = str(raw_input("What is the IP address of the Linux Detonation Chamber? >> "))
     config.write(linaddr + '\n')
-    winaddr = str(raw_input("What is the IP address of the Windows Detonation Chamber? >> "))
+    #winaddr = str(raw_input("What is the IP address of the Windows Detonation Chamber? >> "))
+    winaddr = '0.0.0.0'
     config.write(winaddr + '\n')
     config.close()
 
