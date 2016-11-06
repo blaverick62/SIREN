@@ -33,7 +33,7 @@ def knode_stop():
     os.chdir('..')
 
 def main():
-    config = open("siren.config", mode='a')
+    config = open("siren.config", mode='w')
     linaddr = str(raw_input("What is the IP address of the Linux Detonation Chamber? >> "))
     config.write(linaddr + '\n')
     #winaddr = str(raw_input("What is the IP address of the Windows Detonation Chamber? >> "))

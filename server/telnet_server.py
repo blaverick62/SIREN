@@ -16,17 +16,18 @@ class telnetServerThread(threading.Thread):
         threading.Thread.__init__(self)
         #self.winsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #self.winconn = self.winsock.connect((winaddr, 23))
-        print(linaddr)
-        self.linconn = self.linsock.connect((linaddr, 1234))
+        # winconn = self.winsock.connect((winaddr, 23))
+        self.linsock.connect((linaddr, 1234))
+
 
     def run(self):
 
         while True:
             data = self.conn.recv(256)
             print(data)
+
             #self.winconn.sendall(data)
-            self.linconn.sendall(data)
+            self.linsock.sendall(data)
             self.conn.send(b'Message received fam!\r\n')
 
 
@@ -39,12 +40,16 @@ class telnet_ctrl(threading.Thread):
         self.buff = 4096
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         detaddrs = open("siren.config", mode="r")
-        self.linaddr = detaddrs.readline()
-        self.winaddr = detaddrs.readline()
+        addrs = detaddrs.read()
+        spaddrs = addrs.split('\n')
+        self.linaddr = spaddrs[0]
+        print(self.linaddr)
+        self.winaddr = spaddrs[1]
+        print("Detonation chamber at %s..." % self.linaddr)
         detaddrs.close()
         try:
-            print("Starting Telnet Server...")
-            self.sock.bind((socket.gethostname(), self.port))
+            print("Starting Telnet Server at %s..." % socket.gethostname())
+            self.sock.bind(('', self.port))
         except Exception as e:
             print("Telnet Server failed to bind to port...")
             sys.exit()
