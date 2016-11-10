@@ -29,6 +29,8 @@ telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 telsock.bind(('', 23))
 telsock.listen(5)
 while 1:
-    th = telnetClientThread(telsock.accept())
+    newconn = telsock.accept()
+    print(newconn)
+    th = telnetClientThread(newconn)
     th.start()
     pass
