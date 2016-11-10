@@ -42,5 +42,5 @@ while 1:
         th = telnetClientThread(newconn)
         th.start()
         pass
-    except socket._closedsocket, KeyboardInterrupt:
+    except KeyboardInterrupt:
         break
