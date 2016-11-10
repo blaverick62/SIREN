@@ -7,7 +7,7 @@
 # servers that SIREN implements.                            #
 #############################################################
 
-import socket, threading, sys, select
+import socket, threading, sys
 
 class telnetServerThread(threading.Thread):
     def __init__(self,(conn,addr), linaddr, winaddr):
@@ -17,22 +17,34 @@ class telnetServerThread(threading.Thread):
         #self.winsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # winconn = self.winsock.connect((winaddr, 23))
-        self.linsock.connect((linaddr, 23))
+        try:
+            self.linsock.connect((linaddr, 23))
+        except socket.error:
+            print("Failed to connect to detonation chamber")
+
+
         self.linsock.settimeout(30)
-        self.linsock.setblocking(0)
 
     def run(self):
-
+        self.conn.send(b'Connected, exit character is ^]\r\n')
         while True:
-            data = self.conn.recv(256)
-            print(data)
+            try:
+                data = self.conn.recv(256)
+                print(data)
+            except socket.timeout:
+                print("Connection with attacker has timed out")
+                data = "^]\r\n"
+            if (data == "^]\r\n"):
+                break
             #self.winconn.sendall(data)
             self.linsock.sendall(data)
-            ready = select.select([self.linsock], [], [], 30)
-            response = "Connection to host has timed out... "
-            if ready[0]:
+            try:
                 response = self.linsock.recv(1024)
+            except socket.timeout:
+                response = "Connection with host has timed out"
             self.conn.send(response.encode(encoding='utf-8'))
+        self.linsock.close()
+
 
 
 class telnet_ctrl(threading.Thread):
@@ -64,11 +76,18 @@ class telnet_ctrl(threading.Thread):
     def run(self):
         self.sock.listen(5)
         while 1:
-            newconn = self.sock.accept()
-            print(newconn)
-            th = telnetServerThread(newconn, self.linaddr, self.winaddr)
-            th.start()
-            pass
+            try:
+                newconn = self.sock.accept()
+                print(newconn)
+                try:
+                    th = telnetServerThread(newconn, self.linaddr, self.winaddr)
+                except socket.error:
+                    break
+                th.start()
+                pass
+            except KeyboardInterrupt:
+                break
+        self.sock.close()
 
     def stop(self):
         self.sock.close()
