@@ -59,7 +59,9 @@ class telnet_ctrl(threading.Thread):
     def run(self):
         self.sock.listen(5)
         while 1:
-            th = telnetServerThread(self.sock.accept(), self.linaddr, self.winaddr)
+            newconn = self.sock.accept()
+            print(newconn)
+            th = telnetServerThread(newconn, self.linaddr, self.winaddr)
             th.start()
             pass
 
