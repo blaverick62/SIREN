@@ -7,7 +7,7 @@
 # servers that SIREN implements.                            #
 #############################################################
 
-import socket, threading, sys, os
+import socket, threading, sys, select
 
 class telnetServerThread(threading.Thread):
     def __init__(self,(conn,addr), linaddr, winaddr):
@@ -18,17 +18,21 @@ class telnetServerThread(threading.Thread):
         self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # winconn = self.winsock.connect((winaddr, 23))
         self.linsock.connect((linaddr, 23))
-
+        self.linsock.settimeout(30)
+        self.linsock.setblocking(0)
 
     def run(self):
 
         while True:
             data = self.conn.recv(256)
             print(data)
-
             #self.winconn.sendall(data)
             self.linsock.sendall(data)
-            self.conn.send(b'Message received fam!\r\n')
+            ready = select.select([self.linsock], [], [], 30)
+            response = "Connection to host has timed out... "
+            if ready[0]:
+                response = self.linsock.recv(1024)
+            self.conn.send(response.encode(encoding='utf-8'))
 
 
 class telnet_ctrl(threading.Thread):
@@ -39,6 +43,7 @@ class telnet_ctrl(threading.Thread):
         self.port = 23
         self.buff = 4096
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.settimeout(30)
         detaddrs = open("siren.config", mode="r")
         addrs = detaddrs.read()
         spaddrs = addrs.split('\n')
