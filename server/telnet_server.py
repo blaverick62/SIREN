@@ -17,7 +17,7 @@ class telnetServerThread(threading.Thread):
         #self.winsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # winconn = self.winsock.connect((winaddr, 23))
-        self.linsock.connect((linaddr, 1234))
+        self.linsock.connect((linaddr, 23))
 
 
     def run(self):
@@ -36,7 +36,7 @@ class telnet_ctrl(threading.Thread):
         Control server for the HTTP Protocol server
     """
     def __init__(self):
-        self.port = 2023
+        self.port = 23
         self.buff = 4096
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         detaddrs = open("siren.config", mode="r")
