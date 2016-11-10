@@ -19,7 +19,6 @@ class telnetClientThread(threading.Thread):
 
 
     def run(self):
-
         while True:
             try:
                 cmd = self.conn.recv(256)
@@ -35,7 +34,7 @@ class telnetClientThread(threading.Thread):
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 telsock.bind(('', 23))
 telsock.listen(5)
-telsock.timeout = 30
+telsock.settimeout(30)
 while 1:
     try:
         newconn = telsock.accept()
