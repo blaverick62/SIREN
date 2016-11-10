@@ -21,19 +21,27 @@ class telnetClientThread(threading.Thread):
     def run(self):
 
         while True:
-            cmd = self.conn.recv(256)
-            print(cmd)
-            proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-            cmdout = proc.stdout.read()
+            try:
+                cmd = self.conn.recv(256)
+                print(cmd)
+                proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                cmdout = proc.stdout.read()
+            except socket.timeout, socket._closedsocket:
+                print("Connection with SIREN has timed out")
+                break
             self.conn.send(cmdout.encode(encoding='utf-8'))
 
 
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 telsock.bind(('', 23))
 telsock.listen(5)
+telsock.timeout = 30
 while 1:
-    newconn = telsock.accept()
-    print(newconn)
-    th = telnetClientThread(newconn)
-    th.start()
-    pass
+    try:
+        newconn = telsock.accept()
+        print(newconn)
+        th = telnetClientThread(newconn)
+        th.start()
+        pass
+    except socket._closedsocket, KeyboardInterrupt:
+        break
