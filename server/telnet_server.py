@@ -85,7 +85,7 @@ class telnet_ctrl(threading.Thread):
                     break
                 th.start()
                 pass
-            except KeyboardInterrupt:
+            except KeyboardInterrupt, socket.timeout:
                 break
         self.sock.close()
 
