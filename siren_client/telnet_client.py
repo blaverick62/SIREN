@@ -8,6 +8,7 @@
 #############################################################
 
 import socket, threading
+from subprocess import Popen, PIPE, STDOUT
 
 class telnetClientThread(threading.Thread):
     def __init__(self,(conn,addr)):
@@ -20,9 +21,11 @@ class telnetClientThread(threading.Thread):
     def run(self):
 
         while True:
-            data = self.conn.recv(256)
-            print(data)
-            self.conn.send(b'Message received fam!\r\n')
+            cmd = self.conn.recv(256)
+            print(cmd)
+            proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+            cmdout = proc.stdout.read()
+            self.conn.send(cmdout.encode(encoding='utf-8'))
 
 
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
