@@ -1,5 +1,15 @@
-CREATE SCHEMA IF NOT EXISTS SIREN_DB;
-USE SIREN_DB;
+CREATE SCHEMA IF NOT EXISTS siren_db;
+USE siren_db;
+
+CREATE TABLE IF NOT EXISTS SESSION(
+	session_id INT NOT NULL AUTO_INCREMENT,
+    starttime DATETIME NOT NULL,
+    endtime DATETIME NOT NULL,
+	ip VARCHAR(15) NOT NULL,
+    termsize VARCHAR(7) NOT NULL,
+    client_id INT NOT NULL,
+    PRIMARY KEY (session_id)
+);
 
 CREATE TABLE IF NOT EXISTS AUTH(
 	auth_id INT NOT NULL AUTO_INCREMENT, 
@@ -9,51 +19,25 @@ CREATE TABLE IF NOT EXISTS AUTH(
 	passwd VARCHAR(100) NOT NULL, 
 	timestmp DATETIME NOT NULL,
     PRIMARY KEY (auth_id),
-    FOREIGN KEY (session_id) REFERENCES SISESSION(session_id)
-);
-
-CREATE TABLE IF NOT EXISTS SCLIENT(
-	client_id INT NOT NULL AUTO_INCREMENT,
-    version VARCHAR(50),
-    PRIMARY KEY (client_id)
+    FOREIGN KEY (session_id) REFERENCES SESSION(session_id)
 );
 
 CREATE TABLE IF NOT EXISTS INPUT(
 	input_id INT NOT NULL AUTO_INCREMENT,
     session_id INT NOT NULL,
     timestmp DATETIME NOT NULL,
-    realm VARCHAR(50) NOT NULL,
     success TINYINT NOT NULL,
     input TEXT NOT NULL,
     PRIMARY KEY (input_id),
-    FOREIGN KEY (session_id) REFERENCES SISESSION(session_id)
+    FOREIGN KEY (session_id) REFERENCES SESSION(session_id)
 );
 
-CREATE TABLE IF NOT EXISTS SENSOR(
-	sensor_id INT NOT NULL AUTO_INCREMENT,
-    ip VARCHAR(15) NOT NULL,
-    PRIMARY KEY (sensor_id)
-);
-
-CREATE TABLE IF NOT EXISTS SISESSION(
-	session_id INT NOT NULL AUTO_INCREMENT,
-    starttime DATETIME NOT NULL,
-    endtime DATETIME NOT NULL,
-    sensor_id INT NOT NULL,
-	ip VARCHAR(15) NOT NULL,
-    termsize VARCHAR(7) NOT NULL,
-    client_id INT NOT NULL,
-    PRIMARY KEY (session_id),
-    FOREIGN KEY (client_id) REFERENCES SCLIENT(client_id),
-    FOREIGN KEY (sensor_id) REFERENCES SENSOR(sensor_id)
-);
-
-CREATE TABLE IF NOT EXISTS TTYLOG(
-	tty_id INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS TTPLOG(
+	ttp_id INT NOT NULL AUTO_INCREMENT,
     session_id INT NOT NULL,
     ttylog MEDIUMBLOB NOT NULL,
-    PRIMARY KEY(tty_id),
-    FOREIGN KEY (session_id) REFERENCES SISESSION(session_id)
+    PRIMARY KEY(ttp_id),
+    FOREIGN KEY (session_id) REFERENCES SESSION(session_id)
 );
 
 CREATE TABLE IF NOT EXISTS DOWNLOAD(
@@ -61,7 +45,6 @@ CREATE TABLE IF NOT EXISTS DOWNLOAD(
     session_id INT NOT NULL,
     timestmp DATETIME NOT NULL,
     url TEXT NOT NULL,
-    soutfile TEXT NOT NULL,
     PRIMARY KEY (download_id),
-    FOREIGN KEY (session_id) REFERENCES SISESSION(session_id)
+    FOREIGN KEY (session_id) REFERENCES SESSION(session_id)
 );
