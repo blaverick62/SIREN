@@ -14,6 +14,7 @@ import threading
 from server.http_server import *
 from server.ftp_server import *
 from server.telnet_server import *
+from log.logger import *
 import MySQLdb
 
 
@@ -42,6 +43,12 @@ def main():
     config.write(winaddr + '\n')
     config.close()
 
+    username = str(raw_input("What is your username? > "))
+    password = str(raw_input("What is your password? > "))
+
+    siren_log = logger(username, password)
+    siren_log.start()
+
     #http_thread = http_ctrl()
     #http_thread.setDaemon(True)
 
@@ -54,7 +61,9 @@ def main():
 
 
 
+
     try:
+        pass
         #knode_start()
         #http_thread.start()
         #ftp_thread.start()

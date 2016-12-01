@@ -17,7 +17,12 @@ class telnetServerThread(threading.Thread):
         threading.Thread.__init__(self)
         #self.winsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.logsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # winconn = self.winsock.connect((winaddr, 23))
+        try:
+            self.logsock.connect('localhost', 1337)
+        except socket.error:
+            print("Failed to connect to logging facility")
         try:
             self.linsock.connect((linaddr, 23))
         except socket.error:
@@ -31,7 +36,7 @@ class telnetServerThread(threading.Thread):
         while True:
             try:
                 data = self.conn.recv(256)
-                print(data)
+                self.logsock.send(data)
             except socket.timeout:
                 print("Connection with attacker has timed out")
                 data = "^]\r\n"
@@ -56,7 +61,7 @@ class telnet_ctrl(threading.Thread):
         self.port = 23
         self.buff = 4096
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.settimeout(30)
+        self.sock.settimeout(240)
         detaddrs = open("siren.config", mode="r")
         addrs = detaddrs.read()
         spaddrs = addrs.split('\n')
