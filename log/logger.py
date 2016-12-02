@@ -7,8 +7,8 @@
 # listeners and packages them for the mysql database.       #
 #############################################################
 
-import MySQLdb, threading, socket, Queue
-
+import threading, socket, Queue
+import MySQLdb
 
 class logger(threading.Thread):
 
@@ -64,8 +64,11 @@ class logger_sock(threading.Thread):
     def run(self):
         self.sock.listen(5)
         while (1):
-            th = logger_receive(self.sock.accept(), self.bufferList)
-            th.start()
+            try:
+                th = logger_receive(self.sock.accept(), self.bufferList)
+                th.start()
+            except socket.error, KeyboardInterrupt:
+                break
 
 
 class logger_receive(threading.Thread):

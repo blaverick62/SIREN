@@ -10,12 +10,10 @@
 # and can record data on the attacker.                      #
 #############################################################
 
-import threading
 from server.http_server import *
 from server.ftp_server import *
 from server.telnet_server import *
 from log.logger import *
-import MySQLdb
 
 
 import subprocess, sys, os
