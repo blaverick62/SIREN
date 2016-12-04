@@ -7,7 +7,7 @@
 # servers that SIREN implements.                            #
 #############################################################
 
-import socket, threading
+import socket, threading, os
 from subprocess import Popen, PIPE, STDOUT
 
 class telnetClientThread(threading.Thread):
@@ -23,18 +23,25 @@ class telnetClientThread(threading.Thread):
             try:
                 cmd = self.conn.recv(256)
                 print(cmd)
-                proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-                cmdout = proc.stdout.read()
-            except socket.timeout, socket._closedsocket:
+                if cmd[:2] == 'cd':
+                    currpath = os.getcwd()
+                    os.chdir(cmd[2:])
+                    if os.getcwd() == currpath:
+                        cmdout = "bash: cd: %s: No such file or directory"
+                        self.conn.send(cmdout.encode(encoding='utf-8'))
+                else:
+                    proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                    cmdout = proc.stdout.read()
+                    self.conn.send(cmdout.encode(encoding='utf-8'))
+            except socket.error, socket.timeout:
                 print("Connection with SIREN has timed out")
                 break
-            self.conn.send(cmdout.encode(encoding='utf-8'))
 
 
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 telsock.bind(('', 23))
 telsock.listen(5)
-telsock.settimeout(30)
+telsock.settimeout(240)
 while 1:
     try:
         newconn = telsock.accept()

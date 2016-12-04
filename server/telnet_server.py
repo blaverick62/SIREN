@@ -32,14 +32,19 @@ class telnetServerThread(threading.Thread):
         self.linsock.settimeout(30)
 
     def run(self):
-        self.conn.send(b'Connected, exit character is ^]\r\n')
+        try:
+            self.conn.recv(256)
+        except socket.error:
+            print("Connection closed")
         while True:
             try:
                 data = self.conn.recv(256)
+                data = data[:-2]
                 self.logsock.send(data)
-            except socket.timeout:
-                print("Connection with attacker has timed out")
-                data = "^]\r\n"
+                print(data)
+            except socket.error:
+                print("Connection closed")
+                break
             if (data == "^]\r\n"):
                 break
             #self.winconn.sendall(data)

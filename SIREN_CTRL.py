@@ -45,7 +45,7 @@ def main():
     password = str(raw_input("What is your password? > "))
 
     siren_log = logger(username, password)
-    siren_log.start()
+    siren_log.setDaemon(True)
 
     #http_thread = http_ctrl()
     #http_thread.setDaemon(True)
@@ -65,6 +65,7 @@ def main():
         #knode_start()
         #http_thread.start()
         #ftp_thread.start()
+        siren_log.start()
         telnet_thread.start()
     except KeyboardInterrupt:
         #http_thread.stop()

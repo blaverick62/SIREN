@@ -22,6 +22,8 @@ class logger(threading.Thread):
         self.sock.start()
         self.store.start()
 
+    def stop(self):
+        self.sock.stop()
 
 # class logger_db(threading.Thread):
 #
@@ -52,6 +54,8 @@ class logger_store(threading.Thread):
                 data = self.buffer.get()
                 print(data + " - From logger")
 
+
+
 class logger_sock(threading.Thread):
 
     def __init__(self, buffer):
@@ -69,6 +73,10 @@ class logger_sock(threading.Thread):
                 th.start()
             except socket.error, KeyboardInterrupt:
                 break
+        self.sock.close()
+
+    def stop(self):
+        self.sock.close()
 
 
 class logger_receive(threading.Thread):
