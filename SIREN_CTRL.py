@@ -16,7 +16,7 @@ from server.telnet_server import *
 from log.logger import *
 
 
-import subprocess, sys, os
+import subprocess, sys, os, signal
 
 # Clean up kippo exit
 def knode_start():
@@ -76,11 +76,19 @@ def main():
 
 
     while 1:
-        if sys.stdin == "exit":
+        try:
+            pass
+        except KeyboardInterrupt:
             #http_thread.stop()
             #ftp_thread.stop()
             telnet_thread.stop()
             #knode_stop()
+            break
+        except signal.SIGTERM:
+            # http_thread.stop()
+            # ftp_thread.stop()
+            telnet_thread.stop()
+            # knode_stop()
             break
 
 
