@@ -10,10 +10,10 @@
 # and can record data on the attacker.                      #
 #############################################################
 
-import threading
 from server.http_server import *
 from server.ftp_server import *
 from server.telnet_server import *
+from log.logger import *
 
 
 import subprocess, sys, os
@@ -41,6 +41,12 @@ def main():
     config.write(winaddr + '\n')
     config.close()
 
+    username = str(raw_input("What is your username? > "))
+    password = str(raw_input("What is your password? > "))
+
+    siren_log = logger(username, password)
+    siren_log.setDaemon(True)
+
     #http_thread = http_ctrl()
     #http_thread.setDaemon(True)
 
@@ -53,10 +59,13 @@ def main():
 
 
 
+
     try:
+        pass
         #knode_start()
         #http_thread.start()
         #ftp_thread.start()
+        siren_log.start()
         telnet_thread.start()
     except KeyboardInterrupt:
         #http_thread.stop()
