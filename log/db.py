@@ -33,8 +33,8 @@ class logger_store(threading.Thread):
                         data = self.buffer.get()
                     finally:
                         self.mutex.release()
-                    print(data + " - From logger")
                     args = data.split(';')
+                    # generate unique ids
                     if args[0] == "SESSION":
                         with open('log/log.txt', mode='a') as f:
                             f.write("{}: Client connected from address {}\n".format(args[1], args[2]))

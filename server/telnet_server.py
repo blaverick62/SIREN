@@ -11,6 +11,7 @@ import socket, threading, sys, datetime, signal
 
 
 class telnetServerThread(threading.Thread):
+
     def __init__(self,(conn,addr), linaddr, winaddr):
         self.conn=conn
         self.addr=addr
@@ -29,7 +30,8 @@ class telnetServerThread(threading.Thread):
             print("Failed to connect to detonation chamber")
 
 
-        self.linsock.settimeout(30)
+        self.linsock.settimeout(240)
+
 
     def run(self):
         starttime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -47,13 +49,11 @@ class telnetServerThread(threading.Thread):
                 self.logsock.send("INPUT;{};{};{}".format(ip, timestmp, data))
                 self.logsock.send(data)
                 print(data)
+                # self.winconn.sendall(data)
+                self.linsock.sendall(data)
             except socket.error:
                 print("Connection closed")
                 break
-            if (data == "^]\r\n"):
-                break
-            #self.winconn.sendall(data)
-            self.linsock.sendall(data)
             try:
                 response = self.linsock.recv(20000)
             except socket.timeout:
@@ -98,12 +98,17 @@ class telnet_ctrl(threading.Thread):
                 print(newconn)
                 try:
                     th = telnetServerThread(newconn, self.linaddr, self.winaddr)
+                    th.start()
                 except socket.error:
+                    print("Socket error")
                     break
-                th.start()
-                pass
             except KeyboardInterrupt:
+                print("Keyboard interrupt caught")
                 break
+            except Exception:
+                print("General Exception in telnet control")
+                break
+
         self.sock.close()
 
     def stop(self):
