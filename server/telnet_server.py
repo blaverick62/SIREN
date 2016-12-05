@@ -6,8 +6,8 @@
 # This file specifies the classes for the various control   #
 # servers that SIREN implements.                            #
 #############################################################
-from time import strftime
-import socket, threading, sys, datetime
+
+import socket, threading, sys, datetime, signal
 
 
 class telnetServerThread(threading.Thread):
