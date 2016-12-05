@@ -1,0 +1,6 @@
+2016-12-04 22:16:04: Client connected from address 192.168.91.131
+2016-12-04 22:16:15: 192.168.91.131 entered command: ls
+2016-12-04 22:16:16: 192.168.91.131 entered command: pwdpwd
+2016-12-04 22:16:25: 192.168.91.131 entered command: echo "What up fam!!!"echo "What up fam!!!"
+2016-12-04 22:16:29: 192.168.91.131 entered command: 
+2016-12-04 22:16:59: 192.168.91.131 entered command: 
