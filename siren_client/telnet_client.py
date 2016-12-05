@@ -25,7 +25,7 @@ class telnetClientThread(threading.Thread):
                 print(cmd)
                 if cmd[:2] == 'cd':
                     currpath = os.getcwd()
-                    os.chdir(cmd[2:])
+                    os.chdir(cmd[3:])
                     if os.getcwd() == currpath:
                         cmdout = "bash: cd: %s: No such file or directory"
                         self.conn.send(cmdout.encode(encoding='utf-8'))
