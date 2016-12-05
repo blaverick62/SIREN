@@ -6,8 +6,8 @@
 # This file specifies the classes for the various control   #
 # servers that SIREN implements.                            #
 #############################################################
-
-import socket, threading, sys
+from time import strftime
+import socket, threading, sys, datetime
 
 
 class telnetServerThread(threading.Thread):
@@ -32,14 +32,19 @@ class telnetServerThread(threading.Thread):
         self.linsock.settimeout(30)
 
     def run(self):
+        starttime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        ip = self.addr[0]
+        self.logsock.send("SESSION;{};{}".format(starttime, ip))
         try:
             self.conn.recv(256)
         except socket.error:
             print("Connection closed")
         while True:
             try:
-                data = self.conn.recv(256)
+                data = self.conn.recv(4096)
+                timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 data = data[:-2]
+                self.logsock.send("INPUT;{};{};{}".format(ip, timestmp, data))
                 self.logsock.send(data)
                 print(data)
             except socket.error:
@@ -50,9 +55,10 @@ class telnetServerThread(threading.Thread):
             #self.winconn.sendall(data)
             self.linsock.sendall(data)
             try:
-                response = self.linsock.recv(1024)
+                response = self.linsock.recv(20000)
             except socket.timeout:
                 response = "Connection with host has timed out"
+
             self.conn.send(response.encode(encoding='utf-8'))
         self.linsock.close()
 
