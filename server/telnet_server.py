@@ -38,28 +38,53 @@ class telnetServerThread(threading.Thread):
         ip = self.addr[0]
         self.logsock.send("SESSION;{};{}".format(starttime, ip))
         try:
+            username = ""
+            password = ""
+            success = 0
+            tries = 0
             self.conn.recv(256)
+            while(success == 0 and tries < 3):
+                self.conn.send("login: ")
+                username = self.conn.recv(256)
+                username = username[:-2]
+                self.conn.send("password: ")
+                password = self.conn.recv(256)
+                password = password[:-2]
+                with open('server/users.txt', mode='r') as users:
+                    for line in users:
+                        auth = line.split(':')
+                        if(username == auth[0] and password == auth[1]):
+                            success = 1
+                tries += 1
+            self.logsock.send("AUTH;{};{};{};{};{}".format(starttime,success,username,password,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+            self.linsock.send("pwd")
+            resp = self.linsock.recv(256)
+            self.conn.send(resp)
+            if success == 0:
+                return
         except socket.error:
             print("Connection closed")
+            return
         while True:
             try:
                 data = self.conn.recv(4096)
                 timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 data = data[:-2]
-                self.logsock.send("INPUT;{};{};{}".format(ip, timestmp, data))
+                self.logsock.send("INPUT;{};{};{}".format(starttime, timestmp, data))
                 self.logsock.send(data)
                 print(data)
                 # self.winconn.sendall(data)
                 self.linsock.sendall(data)
             except socket.error:
                 print("Connection closed")
-                break
+                return
             try:
                 response = self.linsock.recv(20000)
-            except socket.timeout:
-                response = "Connection with host has timed out"
 
-            self.conn.send(response.encode(encoding='utf-8'))
+            except socket.timeout:
+                print("Connection with host has timed out")
+                return
+            self.conn.send(response)
         self.linsock.close()
 
 
@@ -86,7 +111,7 @@ class telnet_ctrl(threading.Thread):
             self.sock.bind(('', self.port))
         except Exception as e:
             print("Telnet Server failed to bind to port...")
-            sys.exit()
+            return
 
         threading.Thread.__init__(self)
 
@@ -104,10 +129,12 @@ class telnet_ctrl(threading.Thread):
                     break
             except KeyboardInterrupt:
                 print("Keyboard interrupt caught")
-                break
+                self.sock.close()
+                return
             except Exception:
                 print("General Exception in telnet control")
-                break
+                self.sock.close()
+                return
 
         self.sock.close()
 

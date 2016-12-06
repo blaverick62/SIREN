@@ -32,13 +32,13 @@ class telnetClientThread(threading.Thread):
                 else:
                     proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                     cmdout = proc.stdout.read()
-                    self.conn.send(cmdout.encode(encoding='utf-8'))
+                    self.conn.send(cmdout)
             except socket.error:
                 print("Connection with SIREN has timed out")
-                break
+                return
             except Exception:
                 print("Exception, exiting")
-                break
+                return
 
 
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
