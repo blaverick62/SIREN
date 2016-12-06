@@ -38,7 +38,7 @@ class logger_store(threading.Thread):
                     if args[0] == "SESSION":
                         with open('log/log.txt', mode='a') as f:
                             f.write("{}: Client connected from address {}\n".format(args[1], args[2]))
-                        self.cursor.execute("insert into SESSION values(NULL,'{}','{}');".format(args[1], args[2]))
+                        self.cursor.execute("insert into SESSION values(NULL,'{}','{}',23,'{}');".format(args[1], args[2], args[3]))
                     if args[0] == "INPUT":
                         with open('log/log.txt', mode='a') as f:
                             f.write("{}: {} entered command: {}\n".format(args[2], args[1], args[3]))
@@ -46,7 +46,7 @@ class logger_store(threading.Thread):
                         self.cursor.execute("insert into INPUT values(NULL,{},'{}','{}')".format(id,args[2],args[3]))
                     if args[0] == "AUTH":
                         id = self.cursor.execute("select session_id from SESSION where starttime='{}'".format(args[1]))
-                        self.cursor.execute("insert into AUTH values(NULL,{},{},'{}','{}','{}')".format(args[2],args[3],args[4],args[5],args[6]))
+                        self.cursor.execute("insert into AUTH values(NULL,{},{},'{}','{}','{}')".format(id,args[2],args[3],args[4],args[5]))
 
                     self.db.commit()
                 except KeyboardInterrupt:

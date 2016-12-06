@@ -7,7 +7,7 @@
 # servers that SIREN implements.                            #
 #############################################################
 
-import socket, threading, sys, datetime, signal
+import socket, threading, datetime
 
 
 class telnetServerThread(threading.Thread):
@@ -30,16 +30,15 @@ class telnetServerThread(threading.Thread):
             print("Failed to connect to detonation chamber")
 
 
-        self.linsock.settimeout(240)
+        self.linsock.settimeout(30)
 
 
     def run(self):
         starttime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         ip = self.addr[0]
-        self.logsock.send("SESSION;{};{}".format(starttime, ip))
+        remoteport = self.addr[1]
+        self.logsock.send("SESSION;{};{};{}".format(starttime, ip, remoteport))
         try:
-            username = ""
-            password = ""
             success = 0
             tries = 0
             self.conn.recv(256)
@@ -55,13 +54,14 @@ class telnetServerThread(threading.Thread):
                         auth = line.split(':')
                         if(username == auth[0] and password == auth[1]):
                             success = 1
+                self.logsock.send("AUTH;{};{};{};{};{}".format(starttime, success, username, password,
+                                                               datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
                 tries += 1
-            self.logsock.send("AUTH;{};{};{};{};{}".format(starttime,success,username,password,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+            if success == 0:
+                return
             self.linsock.send("pwd")
             resp = self.linsock.recv(256)
             self.conn.send(resp)
-            if success == 0:
-                return
         except socket.error:
             print("Connection closed")
             return
