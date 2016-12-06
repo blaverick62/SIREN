@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--
+Template Name: BusinessToday
+Author: <a href="http://www.os-templates.com/">OS Templates</a>
+Author URI: http://www.os-templates.com/
+Licence: Free to use under our free template licence terms
+Licence URI: http://www.os-templates.com/template-terms
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>SIREN</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link rel="stylesheet" href="layout/styles/layout.css" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+</head>
+<body id="top">
+<div class="wrapper col1">
+  <div id="header">
+    <div id="logo">
+      <h1><a href="#">SIREN</a></h1>
+    </div>
+    <br class="clear" />
+  </div>
+</div>
+<div class="wrapper col2">
+  <div id="topbar">
+    <div id="topnav">
+      <ul>
+        <li class="active"><a href="index.html">Simple</a></li>
+        <li><a href="pages/style-demo.html">Advanced View</a></li>
+        <li><a href="pages/full-width.html">Settings</a></li>
+      </ul>
+    </div>
+    <br class="clear" />
+  </div>
+</div>
+<canvas id="myChart"></canvas>
+<script>
+	var ctx = document.getElementById('myChart').getContext('2d');
+	var myChart = new Chart(ctx, {
+	type: 'line',
+	data: {
+		labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+		datasets: [{
+			label: 'apples',
+			data: [12, 19, 3, 17, 6, 3, 7],
+			backgroundColor: "rgba(153,255,51,0.4)"
+		}, {
+			label: 'oranges',
+			data: [2, 29, 5, 5, 2, 3, 10],
+			backgroundColor: "rgba(255,153,0,0.4)"
+		}]
+	}
+});
+</script>
+<div class="wrapper col4">
+  <div id="services">
+    <ul>
+      <li>
+        <div class="fl_left"><img src="images/demo/100x180.gif" alt="" /></div>
+        <div class="fl_right">
+          <h2>Indonectetus facilis</h2>
+          <p>Nullamlacus dui ipsum cons eque loborttis non euis que morbi penas dapibulum orna. Urnaultrices quis curabitur phasellentesque.</p>
+          <p class="readmore"><a href="#">Continue Reading &raquo;</a></p>
+        </div>
+      </li>
+      <li>
+        <div class="fl_left"><img src="images/demo/100x180.gif" alt="" /></div>
+        <div class="fl_right">
+          <h2>Indonectetus facilis</h2>
+          <p>Nullamlacus dui ipsum cons eque loborttis non euis que morbi penas dapibulum orna. Urnaultrices quis curabitur phasellentesque.</p>
+          <p class="readmore"><a href="#">Continue Reading &raquo;</a></p>
+        </div>
+      </li>
+      <li class="last">
+        <div class="fl_left"><img src="images/demo/100x180.gif" alt="" /></div>
+        <div class="fl_right">
+          <h2>Indonectetus facilis</h2>
+          <p>Nullamlacus dui ipsum cons eque loborttis non euis que morbi penas dapibulum orna. Urnaultrices quis curabitur phasellentesque.</p>
+          <p class="readmore"><a href="#">Continue Reading &raquo;</a></p>
+        </div>
+      </li>
+    </ul>
+    <br class="clear" />
+  </div>
+</div>
+<div class="wrapper col5">
+  <div id="container">
+    <div id="content">
+      <h2>About This Free CSS Template</h2>
+      <p>This is a W3C standards compliant free website template from <a href="http://www.os-templates.com/">OS Templates</a>.</p>
+      <p>This template is distributed using a <a href="http://www.os-templates.com/template-terms">Website Template Licence</a>, which allows you to use and modify the template for both personal and commercial use when you keep the provided credit links in the footer.</p>
+      <p>For more CSS templates visit <a href="http://www.os-templates.com/">Free Website Templates</a>.</p>
+      <p>Lacusenim inte trices lorem anterdum nam sente vivamus quis fauctor mauris. Wisinon vivamus wisis adipis laorem lobortis curabiturpiscingilla dui platea ipsum lacingilla.</p>
+      <p>Semalique tor sempus vestibulum libero nibh pretium eget eu elit montes. Sedsemporttis sit intesque felit quis elis et cursuspenatibulum tincidunt non curabitae.</p>
+    </div>
+    <div id="column">
+      <div class="holder">
+        <h2>Nullamlacus loborttis</h2>
+        <ul id="latestnews">
+          <li> <img class="imgl" src="images/demo/100x75.gif" alt="" />
+            <p><strong><a href="#">Indonectetus facilis leo.</a></strong></p>
+            <p>Nullamlacus dui ipsum cons eque loborttis non euis que morbi penas dapibulum orna. Urnaultrices quis curabitur phasellentesque.</p>
+          </li>
+          <li class="last"> <img class="imgl" src="images/demo/100x75.gif" alt="" />
+            <p><strong><a href="#">Indonectetus facilis leo.</a></strong></p>
+            <p>Nullamlacus dui ipsum cons eque loborttis non euis que morbi penas dapibulum orna. Urnaultrices quis curabitur phasellentesque.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <br class="clear" />
+  </div>
+</div>
+<div class="wrapper col6">
+  <div id="footer">
+    <div id="login">
+      <h2>Client Login !</h2>
+      <p>Clients can Login to their accounts here.</p>
+      <form action="#" method="post">
+        <fieldset>
+          <legend>Client Login</legend>
+          <div class="fl_left">
+            <input type="text" value="Enter email address&hellip;"  onfocus="this.value=(this.value=='Enter email address&hellip;')? '' : this.value ;" />
+            <input type="password" value="Enter password&hellip;"  onfocus="this.value=(this.value=='Enter password&hellip;')? '' : this.value ;" />
+          </div>
+          <div class="fl_right">
+            <input type="submit" name="login_go" id="login_go" value="&raquo;" />
+          </div>
+        </fieldset>
+      </form>
+      <p><a href="#">&raquo; Lost Your Password</a> | <a href="#">Create An Account &raquo;</a></p>
+    </div>
+    <div class="footbox">
+      <h2>Lacus interdum</h2>
+      <ul>
+        <li><a href="#">Praesent et eros</a></li>
+        <li><a href="#">Praesent et eros</a></li>
+        <li><a href="#">Lorem ipsum dolor</a></li>
+        <li><a href="#">Suspendisse in neque</a></li>
+        <li class="last"><a href="#">Praesent et eros</a></li>
+      </ul>
+    </div>
+    <div class="footbox">
+      <h2>Lacus interdum</h2>
+      <ul>
+        <li><a href="#">Praesent et eros</a></li>
+        <li><a href="#">Praesent et eros</a></li>
+        <li><a href="#">Lorem ipsum dolor</a></li>
+        <li><a href="#">Suspendisse in neque</a></li>
+        <li class="last"><a href="#">Praesent et eros</a></li>
+      </ul>
+    </div>
+    <div class="footbox">
+      <h2>Lacus interdum</h2>
+      <ul>
+        <li><a href="#">Praesent et eros</a></li>
+        <li><a href="#">Praesent et eros</a></li>
+        <li><a href="#">Lorem ipsum dolor</a></li>
+        <li><a href="#">Suspendisse in neque</a></li>
+        <li class="last"><a href="#">Praesent et eros</a></li>
+      </ul>
+    </div>
+    <br class="clear" />
+  </div>
+</div>
+<div class="wrapper col7">
+  <div id="copyright">
+    <p class="fl_left">Copyright &copy; 2014 - All Rights Reserved - <a href="#">Domain Name</a></p>
+    <p class="fl_right">Template by <a target="_blank" href="http://www.os-templates.com/" title="Free Website Templates">OS Templates</a></p>
+    <br class="clear" />
+  </div>
+</div>
+</body>
+</html>
