@@ -14,7 +14,7 @@ class telnetClientThread(threading.Thread):
     def __init__(self,(conn,addr)):
         self.conn=conn
         self.addr=addr
-        print("Connected with SIREN control at %s..." % self.addr)
+        print("Connected with SIREN control at {}...".format(self.addr[0]))
         threading.Thread.__init__(self)
 
 

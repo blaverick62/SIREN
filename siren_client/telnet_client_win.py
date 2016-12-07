@@ -26,7 +26,7 @@ class telnetClientThread(threading.Thread):
                 if cmd[:2] == 'cd':
                     if len(cmd) == 2:
                         cmdout = os.getcwd()
-                        self.conn.send(cmdout)
+                        self.conn.send(cmdout + '\n')
                     else:
                         #currpath = os.getcwd()
                         try:
