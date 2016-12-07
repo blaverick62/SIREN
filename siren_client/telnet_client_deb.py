@@ -7,14 +7,14 @@
 # servers that SIREN implements.                            #
 #############################################################
 
-import socket, threading, os, sys
+import socket, threading, os
 from subprocess import Popen, PIPE, STDOUT
 
 class telnetClientThread(threading.Thread):
     def __init__(self,(conn,addr)):
         self.conn=conn
         self.addr=addr
-        print("Connected with SIREN control at %s..." % self.addr[0])
+        print("Connected with SIREN control at %s..." % self.addr)
         threading.Thread.__init__(self)
 
 
@@ -24,15 +24,13 @@ class telnetClientThread(threading.Thread):
                 cmd = self.conn.recv(256)
                 print(cmd)
                 if cmd[:2] == 'cd':
-                    if len(cmd) == 2:
-                        cmdout = os.getcwd()
+                    currpath = os.getcwd()
+                    os.chdir(cmd[3:])
+                    if os.getcwd() == currpath:
+                        cmdout = "bash: cd: %s: No such file or directory"
                         self.conn.send(cmdout)
                     else:
-                        currpath = os.getcwd()
-                        os.chdir(cmd[3:])
-                        if os.getcwd() == currpath:
-                            cmdout = "bash: cd: %s: No such file or directory"
-                            self.conn.send(cmdout)
+                        self.conn.send("")
                 else:
                     proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                     cmdout = proc.stdout.read()
@@ -43,7 +41,7 @@ class telnetClientThread(threading.Thread):
             except Exception as e:
                 print("Exception, exiting")
                 print(e)
-                sys.exit()
+                return
 
 
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
