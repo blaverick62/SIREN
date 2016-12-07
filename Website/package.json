@@ -1,0 +1,27 @@
+{
+  "name": "siren",
+  "version": "1.0.0",
+  "description": "visualization for siren",
+  "main": "index.js",
+  "scripts": {
+    "test": "ls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blaverick62/siren.git"
+  },
+  "keywords": [
+    "[]"
+  ],
+  "author": "\"\"",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blaverick62/siren/issues"
+  },
+  "homepage": "https://github.com/blaverick62/siren#readme",
+  "dependencies": {
+    "chart.js": "^2.4.0",
+    "jquery": "^3.1.1",
+    "php": "0.0.1"
+  }
+}

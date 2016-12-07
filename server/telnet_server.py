@@ -12,9 +12,10 @@ import socket, threading, datetime
 
 class telnetServerThread(threading.Thread):
 
-    def __init__(self,(conn,addr), linaddr, winaddr):
+    def __init__(self,(conn,addr), linaddr, winaddr, det):
         self.conn=conn
         self.addr=addr
+        self.det=det
         threading.Thread.__init__(self)
         #self.winsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -59,7 +60,10 @@ class telnetServerThread(threading.Thread):
                 tries += 1
             if success == 0:
                 return
-            self.linsock.send("pwd")
+            if self.det == 'l':
+                self.linsock.send("pwd")
+            else:
+                self.linsock.send('cd')
             resp = self.linsock.recv(256)
             self.conn.send(resp)
         except socket.error:
@@ -74,7 +78,16 @@ class telnetServerThread(threading.Thread):
                 self.logsock.send(data)
                 print(data)
                 # self.winconn.sendall(data)
-                self.linsock.sendall(data)
+                if data[:2] == 'cd':
+                    self.linsock.sendall(data)
+                elif data[:3] == 'pwd' and self.det == 'l':
+                    self.linsock.sendall(data)
+                elif data[:2] == 'ls' and self.det == 'l':
+                    self.linsock.sendall(data)
+                elif data[:5] == 'touch' and self.det == 'l':
+                    self.linsock.sendall(data)
+                else:
+                    self.linsock.sendall("echo 'command not found'")
             except socket.error:
                 print("Connection closed")
                 return
@@ -93,11 +106,12 @@ class telnet_ctrl(threading.Thread):
     """
         Control server for the HTTP Protocol server
     """
-    def __init__(self):
+    def __init__(self, det):
         self.port = 23
         self.buff = 4096
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.settimeout(240)
+        self.det = det
         detaddrs = open("siren.config", mode="r")
         addrs = detaddrs.read()
         spaddrs = addrs.split('\n')
@@ -122,7 +136,7 @@ class telnet_ctrl(threading.Thread):
                 newconn = self.sock.accept()
                 print(newconn)
                 try:
-                    th = telnetServerThread(newconn, self.linaddr, self.winaddr)
+                    th = telnetServerThread(newconn, self.linaddr, self.winaddr, self.det)
                     th.start()
                 except socket.error:
                     print("Socket error")

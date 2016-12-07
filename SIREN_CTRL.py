@@ -41,6 +41,7 @@ def main():
     config.write(winaddr + '\n')
     config.close()
 
+    det = str(raw_input("w for windows, l for linux > "))
     username = str(raw_input("What is your username? > "))
     password = str(raw_input("What is your password? > "))
 
@@ -53,7 +54,7 @@ def main():
     #ftp_thread = ftp_ctrl()
     #ftp_thread.setDaemon(True)
 
-    telnet_thread = telnet_ctrl()
+    telnet_thread = telnet_ctrl(det)
     telnet_thread.setDaemon(True)
 
 
