@@ -44,7 +44,6 @@ class telnetClientThread(threading.Thread):
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 telsock.bind(('', 23))
 telsock.listen(5)
-telsock.settimeout(240)
 
 while 1:
     try:
