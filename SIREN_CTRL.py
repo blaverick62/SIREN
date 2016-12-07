@@ -62,7 +62,7 @@ def main():
 
     try:
         pass
-        #knode_start()
+        knode_start()
         #http_thread.start()
         #ftp_thread.start()
         siren_log.start()
@@ -71,7 +71,7 @@ def main():
         #http_thread.stop()
         #ftp_thread.stop()
         telnet_thread.stop()
-        #knode_stop()
+        knode_stop()
         sys.exit()
 
 
@@ -85,7 +85,7 @@ def main():
             #http_thread.stop()
             #ftp_thread.stop()
             telnet_thread.stop()
-            #knode_stop()
+            knode_stop()
             break
         except Exception:
             telnet_thread.stop()
