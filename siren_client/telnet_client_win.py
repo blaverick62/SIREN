@@ -32,7 +32,7 @@ class telnetClientThread(threading.Thread):
                         try:
                             os.chdir(cmd[3:])
                         except Exception as cde:
-                            self.conn.send(cde)
+                            self.conn.send(str(cde))
                         else:
                             self.conn.send("")
                         #if os.getcwd() == currpath:
