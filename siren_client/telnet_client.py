@@ -7,14 +7,14 @@
 # servers that SIREN implements.                            #
 #############################################################
 
-import socket, threading, os
+import socket, threading, os, sys
 from subprocess import Popen, PIPE, STDOUT
 
 class telnetClientThread(threading.Thread):
     def __init__(self,(conn,addr)):
         self.conn=conn
         self.addr=addr
-        print("Connected with SIREN control at %s..." % self.conn)
+        print("Connected with SIREN control at %s..." % self.addr[0])
         threading.Thread.__init__(self)
 
 
@@ -40,9 +40,10 @@ class telnetClientThread(threading.Thread):
             except socket.error:
                 print("Connection with SIREN has timed out")
                 return
-            except Exception:
+            except Exception as e:
                 print("Exception, exiting")
-                return
+                print(e)
+                sys.exit()
 
 
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
