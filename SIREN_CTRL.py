@@ -76,7 +76,7 @@ def main():
 
     while 1:
         try:
-            leave = raw_input("Enter exit to quit >> ")
+            leave = raw_input("Enter exit to quit >>\n")
             if leave == "exit":
                 telnet_thread.stop()
                 sys.exit()
