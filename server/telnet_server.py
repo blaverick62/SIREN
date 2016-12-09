@@ -74,36 +74,49 @@ class telnetServerThread(threading.Thread):
                 data = self.conn.recv(4096)
                 timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 data = data[:-2]
-                if data[0] == "'":
-                    print("SQL Injection detected! Isolating threat...")
-                    with open('threatlog.txt', mode='a') as threatlog:
-                        threatlog.write(ip + ": " + data + '\n')
-                else:
-                    self.logsock.send("INPUT;{};{};{}".format(starttime, timestmp, data))
-                print(data)
-                # self.winconn.sendall(data)
-                if data[:2] == 'cd':
-                    self.linsock.sendall(data)
-                elif data[:3] == 'pwd' and self.det == 'l':
-                    self.linsock.sendall(data)
-                elif data[:2] == 'ls' and self.det == 'l':
-                    self.linsock.sendall(data)
-                elif data[:5] == 'touch' and self.det == 'l':
-                    self.linsock.sendall(data)
-                elif data[:4] == 'echo':
-                    self.linsock.sendall(data)
-                else:
-                    self.linsock.sendall("echo 'command not found'")
+                if len(data) > 0:
+                    if data[0] == "'":
+                        print("SQL Injection detected! Isolating threat...")
+                        with open('threatlog.txt', mode='a') as threatlog:
+                            threatlog.write(ip + ": " + data + '\n')
+                    else:
+                        self.logsock.send("INPUT;{};{};{}".format(starttime, timestmp, data))
+                    print(data)
+                    # self.winconn.sendall(data)
+                    if data[:2] == 'cd':
+                        self.linsock.sendall(data)
+                    elif data[:3] == 'pwd' and self.det == 'l':
+                        self.linsock.sendall(data)
+                        try:
+                            response = self.linsock.recv(20000)
+                        except socket.timeout:
+                            print("Connection with host has timed out")
+                            return
+                        self.conn.send(response)
+                    elif data[:2] == 'ls' and self.det == 'l':
+                        self.linsock.sendall(data)
+                        try:
+                            response = self.linsock.recv(20000)
+                        except socket.timeout:
+                            print("Connection with host has timed out")
+                            return
+                        self.conn.send(response)
+                    elif data[:5] == 'touch' and self.det == 'l':
+                        self.linsock.sendall(data)
+                    elif data[:4] == 'echo':
+                        self.linsock.sendall(data)
+                        try:
+                            response = self.linsock.recv(20000)
+                        except socket.timeout:
+                            print("Connection with host has timed out")
+                            return
+                        self.conn.send(response)
+                    else:
+                        self.linsock.sendall("echo 'command not found'")
             except socket.error:
                 print("Connection closed")
                 return
-            try:
-                response = self.linsock.recv(20000)
 
-            except socket.timeout:
-                print("Connection with host has timed out")
-                return
-            self.conn.send(response)
         self.linsock.close()
 
 
