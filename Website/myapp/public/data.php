@@ -1,32 +1,42 @@
 <?php
+//setting header to json
 header('Content-Type: application/json');
 
-define('DB_HOST', 'localhost');
-define('DB_USERNAME', 'sirenlocal');
-define('DB_PASSWORD', 'sirenproj');
-define('DB_NAME', 'siren_db');
+$servername = "localhost";
+$username = "sirenlocal";
+$password = "sirenproj";
+$db_name = "siren_db";
+print("helloworld");
+// Create connection
+$conn = new mysqli($servername, $username, $password, $db_name);
 
-
-$mysqli = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
-
-if ($mysqli) {
-    die("Connection failed: " . $mysqli->connect_error);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
-echo "Connected successfully";
 
-$query = sprintf("select * from AUTH");
 
-$result = $mysqli->query($query);
+//query to get data from the table
+$query = sprintf("SELECT username FROM AUTH");
 
+//execute query
+$result = $conn->query($query);
+
+//loop through the returned data
 $data = array();
-foreach ($result as $row){
-    $data[] = $row;
+
+while( $row = mysqli_fetch_array($result)){
+    $data[] = $row; // Inside while loop
+
 }
 
-$result->close();
+//free memory associated with result
+mysqli_free_result($result);
 
+//close connection
+$conn->close();
+
+//now print the data
 print json_encode($data);
-
-
 
 ?>
