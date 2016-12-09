@@ -17,7 +17,7 @@ if ($conn->connect_error) {
 
 
 //query to get data from the table
-$query = sprintf("SELECT username FROM AUTH");
+$query = sprintf("SELECT username FROM AUTH;");
 
 //execute query
 $result = $conn->query($query);
@@ -27,7 +27,6 @@ $data = array();
 
 while( $row = mysqli_fetch_array($result)){
     $data[] = $row; // Inside while loop
-
 }
 
 //free memory associated with result
