@@ -1,32 +1,104 @@
 <?php
+//setting header to json
 header('Content-Type: application/json');
 
-define('DB_HOST', 'localhost');
-define('DB_USERNAME', 'sirenlocal');
-define('DB_PASSWORD', 'sirenproj');
-define('DB_NAME', 'siren_db');
+$servername = "localhost";
+$username = "sirenlocal";
+$password = "sirenproj";
+$db_name = "siren_db";
+// Create connection
+$conn = new mysqli($servername, $username, $password, $db_name);
 
-
-$mysqli = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
-
-if ($mysqli) {
-    die("Connection failed: " . $mysqli->connect_error);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
-echo "Connected successfully";
 
-$query = sprintf("select * from AUTH");
 
-$result = $mysqli->query($query);
-
+//query to get data from the table
+$queryuse = sprintf("SELECT username FROM AUTH;");
 $data = array();
-foreach ($result as $row){
-    $data[] = $row;
+if ($result=mysqli_query($conn,$queryuse))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $data[] = $row[0];
+    }
+  // Free result set
+    mysqli_free_result($result);
 }
 
-$result->close();
+$querypass = sprintf("SELECT passwd FROM AUTH;");
+$datapass = array();
+if ($result=mysqli_query($conn,$querypass))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $datapass[] = $row[0];
+    }
+  // Free result set
+    mysqli_free_result($result);
+}
 
-print json_encode($data);
+$querysucc = sprintf("SELECT success FROM AUTH;");
+$datasucc = array();
+if ($result=mysqli_query($conn,$querysucc))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $datasucc[] = $row[0];
+    }
+  // Free result set
+    mysqli_free_result($result);
+}
 
+$queryip = sprintf("SELECT ip FROM SESSION;");
+$dataip = array();
+if ($result=mysqli_query($conn,$queryip))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $dataip[] = $row[0];
+    }
+  // Free result set
+    mysqli_free_result($result);
+}
 
+$querycmd = sprintf("SELECT input FROM INPUT;");
+$datacmd = array();
+if ($result=mysqli_query($conn,$querycmd))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $datacmd[] = $row[0];
+    }
+  // Free result set
+    mysqli_free_result($result);
+}
 
+//$querypass = sprintf("SELECT passwd FROM AUTH;");
+
+//$resultpass = $conn->query($querypass);
+
+$usernames = json_encode($data);
+$passwords = json_encode($datapass);
+$successes = json_encode($datasucc);
+$ips =  json_encode($dataip);
+$cmds = json_encode($datacmd);
+
+$dataout = array();
+$dataout[0] = $usernames;
+$dataout[1] = $passwords;
+$dataout[2] = $successes;
+$dataout[3] = $ips;
+$dataout[4] = $cmds;
+
+echo json_encode($dataout);
+
+//free memory associated with result
+
+//close connection
+$conn->close();
+
+//now print the data
 ?>

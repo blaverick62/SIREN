@@ -1,0 +1,2 @@
+192.168.91.131: 'select * from AUTH;'
+192.168.91.131: 'drop table AUTH;'

@@ -74,8 +74,12 @@ class telnetServerThread(threading.Thread):
                 data = self.conn.recv(4096)
                 timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 data = data[:-2]
-                self.logsock.send("INPUT;{};{};{}".format(starttime, timestmp, data))
-                self.logsock.send(data)
+                if data[0] == "'":
+                    print("SQL Injection detected! Isolating threat...")
+                    with open('threatlog.txt', mode='a') as threatlog:
+                        threatlog.write(ip + ": " + data + '\n')
+                else:
+                    self.logsock.send("INPUT;{};{};{}".format(starttime, timestmp, data))
                 print(data)
                 # self.winconn.sendall(data)
                 if data[:2] == 'cd':
@@ -85,6 +89,8 @@ class telnetServerThread(threading.Thread):
                 elif data[:2] == 'ls' and self.det == 'l':
                     self.linsock.sendall(data)
                 elif data[:5] == 'touch' and self.det == 'l':
+                    self.linsock.sendall(data)
+                elif data[:4] == 'echo':
                     self.linsock.sendall(data)
                 else:
                     self.linsock.sendall("echo 'command not found'")
