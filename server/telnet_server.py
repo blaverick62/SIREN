@@ -7,7 +7,7 @@
 # servers that SIREN implements.                            #
 #############################################################
 
-import socket, threading, datetime
+import socket, threading, datetime, sys
 
 
 class telnetServerThread(threading.Thread):
@@ -160,15 +160,15 @@ class telnet_ctrl(threading.Thread):
                     th.start()
                 except socket.error:
                     print("Socket error")
-                    break
+                    sys.exit()
             except KeyboardInterrupt:
                 print("Keyboard interrupt caught")
                 self.sock.close()
-                return
+                sys.exit()
             except Exception:
                 print("General Exception in telnet control")
                 self.sock.close()
-                return
+                sys.exit()
 
         self.sock.close()
 
