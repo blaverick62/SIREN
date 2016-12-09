@@ -67,3 +67,5 @@ ls
 2016-12-05 21:00:38: 2016-12-05 21:00:14 entered command: lsls
 2016-12-05 21:00:39: 2016-12-05 21:00:14 entered command: pwdpwd
 2016-12-05 21:01:02: 2016-12-05 21:00:14 entered command: 
+2016-12-07 02:12:53: Client connected from address 192.168.43.215
+2016-12-07 02:17:51: Client connected from address 192.168.43.215
