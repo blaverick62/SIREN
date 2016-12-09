@@ -59,6 +59,7 @@ class telnetServerThread(threading.Thread):
                                                                datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
                 tries += 1
             if success == 0:
+                print("Unauthorized")
                 return
             if self.det == 'l':
                 self.linsock.send("pwd")
@@ -153,7 +154,7 @@ class telnet_ctrl(threading.Thread):
         while 1:
             try:
                 newconn = self.sock.accept()
-                print(newconn)
+                print(newconn[1][0])
                 try:
                     th = telnetServerThread(newconn, self.linaddr, self.winaddr, self.det)
                     th.start()
