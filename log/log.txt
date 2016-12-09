@@ -67,3 +67,15 @@ ls
 2016-12-05 21:00:38: 2016-12-05 21:00:14 entered command: lsls
 2016-12-05 21:00:39: 2016-12-05 21:00:14 entered command: pwdpwd
 2016-12-05 21:01:02: 2016-12-05 21:00:14 entered command: 
+2016-12-07 14:01:20: Client connected from address 192.168.224.130
+2016-12-07 14:13:27: Client connected from address 192.168.224.130
+2016-12-07 14:13:48: 2016-12-07 14:13:27 entered command: lsls
+2016-12-07 14:13:52: 2016-12-07 14:13:27 entered command: lsls
+2016-12-07 14:13:54: 2016-12-07 14:13:27 entered command: pwdpwd
+2016-12-07 14:14:00: 2016-12-07 14:13:27 entered command: 
+2016-12-07 14:14:00: 2016-12-07 14:13:27 entered command: 
+2016-12-07 14:23:39: Client connected from address 192.168.224.130
+2016-12-07 14:23:53: 2016-12-07 14:23:39 entered command: lsls
+2016-12-07 14:23:56: 2016-12-07 14:23:39 entered command: pwd
+2016-12-07 14:24:05: 2016-12-07 14:23:39 entered command: touch iwashere.txt
+2016-12-08 17:47:51: Client connected from address 192.168.91.131
