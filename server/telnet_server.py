@@ -59,7 +59,7 @@ class telnetServerThread(threading.Thread):
                                                                datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
                 tries += 1
             if success == 0:
-                print("Unauthorized")
+                self.conn.send("Unauthorized")
                 return
             if self.det == 'l':
                 self.linsock.send("pwd")
