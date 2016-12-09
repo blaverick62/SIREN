@@ -24,10 +24,25 @@ $result = $conn->query($query);
 
 //loop through the returned data
 $data = array();
+$uname_count = array();
 
-while( $row = mysqli_fetch_array($result)){
+while( $row = mysqli_fetch_array($result, MYSQLI_ASSOC)){
     $data[] = $row; // Inside while loop
 }
+
+foreach($data as $name){
+    printf ("%s\n",$name["username"]);
+    if (in_array($name.username, $uname_count, TRUE)){
+        //$uname_count[$name.username] ++;
+        printf ("TRUE\n");
+    }
+    elseif(!in_array($name.username, $uname_count, TRUE)){
+    printf ("FALSE\n");
+    $uname_count[] = $name;
+    printf ("added %s to list\n", $uname_count["username"]);
+    }
+}
+
 
 //free memory associated with result
 mysqli_free_result($result);
