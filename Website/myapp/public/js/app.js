@@ -56,7 +56,7 @@ $(document).ready(function(){
 				        labels: uniqueips,
 				        datasets : [{
                             label: 'IP Address Hits',
-                            backgroundColor: 'rgba(200, 200, 200, 0.75)',
+                            backgroundColor: 'rgba(255, 138, 51, 0.75)',
                             borderColor: 'rgba(200, 200, 200, 0.75)',
                             data: ipcount
                         }]
@@ -92,7 +92,7 @@ $(document).ready(function(){
 				        labels: uniqueusers,
 				        datasets : [{
                             label: 'Common Usernames',
-                            backgroundColor: 'rgba(200, 200, 200, 0.75)',
+                            backgroundColor: 'rgba( 51, 255, 215 , 0.75)',
                             borderColor: 'rgba(200, 200, 200, 0.75)',
                             data: uscount
                         }]
@@ -128,8 +128,8 @@ $(document).ready(function(){
 				        labels: uniquepass,
 				        datasets : [{
                             label: 'Common Passwords',
-                            backgroundColor: 'rgba(200, 200, 200, 0.75)',
-                            borderColor: 'rgba(200, 200, 200, 0.75)',
+                            backgroundColor: 'rgba(252, 51, 255, 0.75)',
+                            borderColor: 'rgba(200, 200, 200, 1)',
                             data: passcount
                         }]
 			            },
@@ -163,11 +163,67 @@ $(document).ready(function(){
                 }
             });
 
-            var cmdlist = "";
+            var cmdlist = "<li>Commands Entered:</li>";
             for(i = 0; i < commands.length; i++){
                 cmdlist = cmdlist + "<li>" + commands[i] + "</li>";
             }
             $('#input').html(cmdlist);
+
+            var percount = [];
+            var uniquepassper = [];
+            var unpassper = 0;
+            for(i = 0; i < passwords.length; i++) {
+                if(uniquepassper.length != 0) {
+                    for (j = 0; j < uniquepassper.length; j++) {
+                        if (passwords[i] == uniquepassper[j]) {
+                            percount[j]++;
+                            unpassper = 1;
+                        }
+                    }
+                }
+                if(unpassper == 0){
+                    uniquepassper.push(passwords[i]);
+                    percount.push(1);
+                    unpassper = 0;
+                }
+                else{
+                    unpassper = 0;
+                }
+            }
+
+            var percents = [];
+            for(i = 0; i < uniquepassper.length; i++) {
+                percents.push(percount[i] / (passwords.length) * 100);
+            }
+
+
+            var color = '#';
+            var letters = '0123456789ABCDEF';
+            var colorargs = [];
+            for(i = 0; i < uniquepassper.length; i++){
+                color = '#';
+                for (var j = 0; j < 6; j++ ) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                colorargs.push(color);
+            }
+
+            console.log(colorargs);
+            console.log(uniquepassper);
+            console.log(percents);
+
+            var passPerPie = $('#passper');
+            new Chart(passPerPie,{
+                type: 'doughnut',
+                data: {
+                    labels: uniquepassper,
+                    datasets: [{
+                        backgroundColor: colorargs,
+                        data: percents
+                    }]
+                }
+            });
+
 
 
 		},
