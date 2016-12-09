@@ -1,4 +1,6 @@
 $(document).ready(function(){
+
+
 	$.ajax({
         type: "GET",
 		url: "data.php",
@@ -223,8 +225,7 @@ $(document).ready(function(){
                     }]
                 }
             });
-
-
+            
 
 		},
 		error: function(ts) {
