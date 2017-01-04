@@ -18,31 +18,29 @@
 	<script type="text/javascript" src="js/angular.min.js"></script>
 	<script type="text/javascript" src="js/ang.js"></script>
 	<script type="text/javascript" src="js/app.js"></script>
-	<div ng-app="siren" ng-controller="sirenctrl">
-		<select ng-model="selectedChart" ng-options="x for x in charts">
-		</select>
+	<div>
 		<div id="chart-container">
-			<div id="ip-bar" class="graph-container" ng-bind="ip">
+			<div id="ip-bar" class="graph-container" >
 				<h3 class="graph-label">IP Address Hits</h3>
 				<canvas id="ipcanvas" class="bar"></canvas>
 			</div>
-			<div id="user-bar" class="graph-container" ng-bind="username">
+			<div id="user-bar" class="graph-container" >
 				<h3 class="graph-label">Usernames Entered</h3>
 				<canvas id="usernames" class="bar"></canvas>
 			</div>
-			<div id="password-bar" class="graph-container" ng-bind="password">
+			<div id="password-bar" class="graph-container" >
 				<h3 class="graph-label">Passwords Entered</h3>
 				<canvas id="passwords" class="bar"></canvas>
 			</div>
-			<div id="success-pie" class="pie-container" ng-bind="successpie">
+			<div id="success-pie" class="pie-container">
 				<h3 class="graph-label">Successful/Failed Logins</h3>
 				<canvas id="successes" class="pie"></canvas>
 			</div>
-			<div id="password-pie" class="pie-container" ng-bind="passwordpie">
+			<div id="password-pie" class="pie-container" >
 				<h3 class="graph-label">Most Common Passwords</h3>
 				<canvas id="passper" class="pie"></canvas>
 			</div>
-			<div id="command-list" ng-bind="commands">
+			<div id="command-list" >
 				<ul id="input"></ul>
 			</div>
 		</div>
