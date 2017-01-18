@@ -14,6 +14,7 @@ $(document).ready(function(){
             var successes = JSON.parse(data[2]);
             var ips = JSON.parse(data[3]);
             var commands = JSON.parse(data[4]);
+	    var starttimes = JSON.parse(data[5]);
 
             var ipcount = [];
             var uniqueips = [];
@@ -225,7 +226,51 @@ $(document).ready(function(){
                     }]
                 }
             });
-            
+
+            var rollback = 4;
+            var hours = [];
+
+            for(i = 0; i < starttimes.length; i++){
+                base = starttimes[i].getHours();
+                hours.push(base);
+            }
+
+            var hrcount = [];
+            var uniquehours = [];
+            var unhours = 0;
+            for(i = 0; i < hours.length; i++) {
+                if(uniquehours.length != 0) {
+                    for (j = 0; j < uniquehours.length; j++) {
+                        if (hours[i] == uniquehours[j]) {
+                            hrcount[j]++;
+                            unhours = 1;
+                        }
+                    }
+                }
+                if(unhours == 0){
+                    uniquehours.push(hours[i]);
+                    hrcount.push(1);
+                    unhours = 0;
+                }
+                else{
+                    unhours = 0;
+                }
+            }
+
+            var loginchart = $("#loginfrequency");
+                        new Chart(loginchart, {
+                                type: 'line',
+                                data: {
+                                    labels: uniquehours,
+                                    datasets : [{
+                                        label: 'Login Frequency by Time',
+                                        backgroundColor: 'rgba( 51, 255, 215 , 0.75)',
+                                        borderColor: 'rgba(200, 200, 200, 0.75)',
+                                        data: hrcount
+                                    }]
+                                },
+                options: options
+                        });
 
 		},
 		error: function(ts) {

@@ -76,6 +76,16 @@ if ($result=mysqli_query($conn,$querycmd))
     mysqli_free_result($result);
 }
 
+$querylogstart = sprintf("SELECT  starttime FROM SESSION;");
+$datalogstart = array();
+if ($result=mysqli_query($conn,$querylogstart))
+  {
+  while($row=mysqli_fetch_row($result)){
+	$datalogstart[] = $row[0];
+  }
+  mysqli_free_result($result);
+}
+
 //$querypass = sprintf("SELECT passwd FROM AUTH;");
 
 //$resultpass = $conn->query($querypass);
@@ -85,6 +95,7 @@ $passwords = json_encode($datapass);
 $successes = json_encode($datasucc);
 $ips =  json_encode($dataip);
 $cmds = json_encode($datacmd);
+$starttime = json_encode($datalogstart);
 
 $dataout = array();
 $dataout[0] = $usernames;
@@ -92,6 +103,7 @@ $dataout[1] = $passwords;
 $dataout[2] = $successes;
 $dataout[3] = $ips;
 $dataout[4] = $cmds;
+$dataout[5] = $starttime;
 
 echo json_encode($dataout);
 
