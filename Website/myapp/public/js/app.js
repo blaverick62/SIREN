@@ -227,35 +227,29 @@ $(document).ready(function(){
                 }
             });
 
+            var dates = [];
+            var dt;
+            for(i=0; i < starttimes.length; i++){
+                dt  = starttimes[i].split(/\-|\s/);
+                dates.push(new Date(dt.slice(0,3).reverse().join('-') + ' ' + dt[3]));
+            }
+
             var rollback = 4;
             var hours = [];
-
-            for(i = 0; i < starttimes.length; i++){
-                base = starttimes[i].getHours();
-                hours.push(base);
+            var split = 1;
+            var points = rollback / split;
+            console.log(dates[0]);
+            console.log(dates[2]);
+            var mostrecent = dates[dates.length - 1];
+            var timesplits = [];
+            timesplits.push(mostrecent);
+            for(i = 0; i < points - 1; i++){
+                prev = timesplits[i].getHours;
+                console.log(prev);
+                timesplits.push(timesplits[i].setHours(prev - 1));
             }
 
-            var hrcount = [];
-            var uniquehours = [];
-            var unhours = 0;
-            for(i = 0; i < hours.length; i++) {
-                if(uniquehours.length != 0) {
-                    for (j = 0; j < uniquehours.length; j++) {
-                        if (hours[i] == uniquehours[j]) {
-                            hrcount[j]++;
-                            unhours = 1;
-                        }
-                    }
-                }
-                if(unhours == 0){
-                    uniquehours.push(hours[i]);
-                    hrcount.push(1);
-                    unhours = 0;
-                }
-                else{
-                    unhours = 0;
-                }
-            }
+
 
             var loginchart = $("#loginfrequency");
                         new Chart(loginchart, {
