@@ -41,8 +41,8 @@ class logger_store(threading.Thread):
                         self.cursor.execute("insert into SESSION values(NULL,'{}','{}','{}','{}',{},{});".format(args[1], args[2], args[3], args[4], args[5], args[6]))
                     if args[0] == "UPDATE":
                         with open('log/log.txt', mode='a') as f:
-                            f.write("Client closed connection at time {}\n").format(args[1])
-                        self.cursor.execute("update SESSION set endtime={};").format(args[1])
+                            f.write("Client closed connection at time {}\n".format(args[1]))
+                        self.cursor.execute("update SESSION set endtime='{}' where starttime='{}';".format(args[1], args[2]))
                     if args[0] == "INPUT":
                         with open('log/log.txt', mode='a') as f:
                             f.write("{}: {} entered command: {}\n".format(args[2], args[1], args[3]))

@@ -14,7 +14,6 @@ class telnetClientThread(threading.Thread):
     def __init__(self,(conn,addr)):
         self.conn=conn
         self.addr=addr
-        self.conn.settimeout(30)
         print("Connected with SIREN control at {}...".format(self.addr[0]))
         threading.Thread.__init__(self)
 
@@ -36,7 +35,6 @@ class telnetClientThread(threading.Thread):
                     self.conn.send(cmdout)
             except socket.timeout:
                 print("Connection with SIREN has timed out")
-                self.conn.close()
                 return
 
     def stop(self):
@@ -46,6 +44,7 @@ class telnetClientThread(threading.Thread):
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 telsock.bind(('', 23))
 telsock.listen(5)
+telsock.settimeout(30)
 threads = []
 
 while 1:
@@ -59,6 +58,8 @@ while 1:
         for i in threads:
             i.stop()
         sys.exit()
+    except socket.timeout:
+        print("Connection with SIREN has timed out")
     line = sys.stdin.read()
     if line == "exit":
         for i in threads:
