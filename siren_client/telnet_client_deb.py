@@ -23,7 +23,7 @@ class telnetClientThread(threading.Thread):
             try:
                 cmd = self.conn.recv(256)
                 print(cmd)
-                if cmd[:2] == "TERMINATE":
+                if cmd == "TERMINATE":
                     print("Session closed")
                     return
                 if cmd[:2] == 'cd':
