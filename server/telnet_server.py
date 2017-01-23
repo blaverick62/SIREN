@@ -45,7 +45,7 @@ class telnetServerThread(threading.Thread):
         except self.conn.timeout:
             self.linsock.close()
             endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            self.logsock.send("SESSION;{};{};{};{};{}".format(starttime, endtime, ip, 'telnet', remoteport))
+            self.logsock.send("".format(starttime, endtime, ip, 'telnet', remoteport))
             return
         while(success == 0 and tries < 3):
             self.conn.send("login: ")
@@ -66,7 +66,7 @@ class telnetServerThread(threading.Thread):
             self.conn.send("Unauthorized")
             self.conn.close()
             endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            self.logsock.send("SESSION;{};{};{};{};{}".format(starttime, endtime, ip, 'telnet', remoteport))
+            self.logsock.send("SESSION;{};{};{};{};{};{}".format(starttime, endtime, ip, 'telnet',23, remoteport))
             return
         if self.det == 'l':
             self.linsock.send("pwd")
@@ -84,7 +84,7 @@ class telnetServerThread(threading.Thread):
             except self.conn.timeout:
                 print("Connection closed for unknown reason by attacker")
                 endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                self.logsock.send("SESSION;{};{};{};{};{}".format(starttime, endtime, ip, 'telnet', remoteport))
+                self.logsock.send("SESSION;{};{};{};{};{};{}".format(starttime, endtime, ip, 'telnet',23, remoteport))
                 self.linsock.close()
                 return
 
@@ -113,7 +113,7 @@ class telnetServerThread(threading.Thread):
                     except self.linsock.timeout:
                         print("Connection with detonation chamber has timed out")
                         endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                        self.logsock.send("SESSION;{};{};{};{};{}".format(starttime, endtime, ip, 'telnet', remoteport))
+                        self.logsock.send("SESSION;{};{};{};{};{};{}".format(starttime, endtime, ip, 'telnet',23, remoteport))
                         self.conn.close()
                         return
                     self.conn.send(response)
@@ -126,7 +126,7 @@ class telnetServerThread(threading.Thread):
                     except self.linsock.timeout:
                         print("Connection with detonation chamber has timed out")
                         endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                        self.logsock.send("SESSION;{};{};{};{};{}".format(starttime, endtime, ip, 'telnet', remoteport))
+                        self.logsock.send("SESSION;{};{};{};{};{};{}".format(starttime, endtime, ip, 'telnet',23, remoteport))
                         self.linsock.close()
                         return
                     self.conn.send(response)
@@ -144,7 +144,7 @@ class telnetServerThread(threading.Thread):
                         print("Connection with detonation chamber has timed out")
                         self.conn.close()
                         endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                        self.logsock.send("SESSION;{};{};{};{};{}".format(starttime, endtime, ip, 'telnet', remoteport))
+                        self.logsock.send("SESSION;{};{};{};{};{};{}".format(starttime, endtime, ip, 'telnet',23, remoteport))
                         return
                     self.conn.send(response)
 

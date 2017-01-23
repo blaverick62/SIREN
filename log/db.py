@@ -37,8 +37,8 @@ class logger_store(threading.Thread):
                     # generate unique ids
                     if args[0] == "SESSION":
                         with open('log/log.txt', mode='a') as f:
-                            f.write("{}: Client connected from address {}\n".format(args[1], args[2]))
-                        self.cursor.execute("insert into SESSION values(NULL,'{}','{}',23,'{}');".format(args[1], args[2], args[3]))
+                            f.write("{}: Client connected from address {}\n".format(args[1], args[3]))
+                        self.cursor.execute("insert into SESSION values(NULL,'{}','{}','{}','{},'{}','{}');".format(args[1], args[2], args[3], args[4], args[5], args[6]))
                     if args[0] == "INPUT":
                         with open('log/log.txt', mode='a') as f:
                             f.write("{}: {} entered command: {}\n".format(args[2], args[1], args[3]))
