@@ -29,97 +29,135 @@ class telnetServerThread(threading.Thread):
             self.linsock.connect((linaddr, 23))
         except socket.error:
             print("Failed to connect to detonation chamber")
-
-
         self.linsock.settimeout(30)
 
 
     def run(self):
+
+        # Authorization and brute force logger
         starttime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         ip = self.addr[0]
         remoteport = self.addr[1]
-        self.logsock.send("SESSION;{};{};{}".format(starttime, ip, remoteport))
+        success = 0
+        tries = 0
         try:
-            success = 0
-            tries = 0
             self.conn.recv(256)
-            while(success == 0 and tries < 3):
-                self.conn.send("login: ")
-                username = self.conn.recv(256)
-                username = username[:-2]
-                self.conn.send("password: ")
-                password = self.conn.recv(256)
-                password = password[:-2]
-                with open('server/users.txt', mode='r') as users:
-                    for line in users:
-                        auth = line.split(':')
-                        if(username == auth[0] and password == auth[1]):
-                            success = 1
-                self.logsock.send("AUTH;{};{};{};{};{}".format(starttime, success, username, password,
-                                                               datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
-                tries += 1
-            if success == 0:
-                self.conn.send("Unauthorized")
-                return
-            if self.det == 'l':
-                self.linsock.send("pwd")
-            else:
-                self.linsock.send('cd')
-            resp = self.linsock.recv(256)
-            self.conn.send(resp)
-        except socket.error:
-            print("Connection closed")
+        except self.conn.timeout:
+            self.linsock.close()
+            endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            self.logsock.send("SESSION;{};{};{};{};{}".format(starttime, endtime, ip, 'telnet', remoteport))
             return
+        while(success == 0 and tries < 3):
+            self.conn.send("login: ")
+            username = self.conn.recv(256)
+            username = username[:-2]
+            self.conn.send("password: ")
+            password = self.conn.recv(256)
+            password = password[:-2]
+            with open('server/users.txt', mode='r') as users:
+                for line in users:
+                    auth = line.split(':')
+                    if(username == auth[0] and password == auth[1]):
+                        success = 1
+            self.logsock.send("AUTH;{};{};{};{};{}".format(starttime, success, username, password,
+                                                           datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+            tries += 1
+        if success == 0:
+            self.conn.send("Unauthorized")
+            self.conn.close()
+            endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            self.logsock.send("SESSION;{};{};{};{};{}".format(starttime, endtime, ip, 'telnet', remoteport))
+            return
+        if self.det == 'l':
+            self.linsock.send("pwd")
+        else:
+            self.linsock.send('cd')
+        resp = self.linsock.recv(256)
+        self.conn.send(resp)
+
+
+        # Receive loop and emulator
         while True:
+
             try:
                 data = self.conn.recv(4096)
-                timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                data = data[:-2]
-                if len(data) > 0:
-                    if data[0] == "'":
-                        print("SQL Injection detected! Isolating threat...")
-                        with open('threatlog.txt', mode='a') as threatlog:
-                            threatlog.write(ip + ": " + data + '\n')
-                    else:
-                        self.logsock.send("INPUT;{};{};{}".format(starttime, timestmp, data))
-                    print(data)
-                    # self.winconn.sendall(data)
-                    if data[:2] == 'cd':
-                        self.linsock.sendall(data)
-                    elif data[:3] == 'pwd' and self.det == 'l':
-                        self.linsock.sendall(data)
-                        try:
-                            response = self.linsock.recv(20000)
-                        except socket.timeout:
-                            print("Connection with host has timed out")
-                            self.linsock.close()
-                            return
-                        self.conn.send(response)
-                    elif data[:2] == 'ls' and self.det == 'l':
-                        self.linsock.sendall(data)
-                        try:
-                            response = self.linsock.recv(20000)
-                        except socket.timeout:
-                            print("Connection with host has timed out")
-                            self.linsock.close()
-                            return
-                        self.conn.send(response)
-                    elif data[:5] == 'touch' and self.det == 'l':
-                        self.linsock.sendall(data)
-                    elif data[:4] == 'echo':
-                        self.linsock.sendall(data)
-                        try:
-                            response = self.linsock.recv(20000)
-                        except socket.timeout:
-                            print("Connection with host has timed out")
-                            self.linsock.close()
-                            return
-                        self.conn.send(response)
-                    else:
-                        self.linsock.sendall("echo 'command not found'")
-            except socket.error:
-                print("Connection closed")
+            except self.conn.timeout:
+                print("Connection closed for unknown reason by attacker")
+                endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                self.logsock.send("SESSION;{};{};{};{};{}".format(starttime, endtime, ip, 'telnet', remoteport))
+                self.linsock.close()
                 return
+
+
+            timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            data = data[:-2]
+            if len(data) > 0:
+                if data[0] == "'":
+                    print("SQL Injection detected! Isolating threat...")
+                    with open('threatlog.txt', mode='a') as threatlog:
+                        threatlog.write(ip + ": " + data + '\n')
+                else:
+                    self.logsock.send("INPUT;{};{};{}".format(starttime, timestmp, data))
+                print(data)
+                # self.winconn.sendall(data)
+
+
+                if data[:2] == 'cd':
+                    self.linsock.sendall(data)
+
+
+                elif data[:3] == 'pwd' and self.det == 'l':
+                    self.linsock.sendall(data)
+                    try:
+                        response = self.linsock.recv(20000)
+                    except self.linsock.timeout:
+                        print("Connection with detonation chamber has timed out")
+                        endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        self.logsock.send("SESSION;{};{};{};{};{}".format(starttime, endtime, ip, 'telnet', remoteport))
+                        self.conn.close()
+                        return
+                    self.conn.send(response)
+
+
+                elif data[:2] == 'ls' and self.det == 'l':
+                    self.linsock.sendall(data)
+                    try:
+                        response = self.linsock.recv(20000)
+                    except self.linsock.timeout:
+                        print("Connection with detonation chamber has timed out")
+                        endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        self.logsock.send("SESSION;{};{};{};{};{}".format(starttime, endtime, ip, 'telnet', remoteport))
+                        self.linsock.close()
+                        return
+                    self.conn.send(response)
+
+
+                elif data[:5] == 'touch' and self.det == 'l':
+                    self.linsock.sendall(data)
+
+
+                elif data[:4] == 'echo':
+                    self.linsock.sendall(data)
+                    try:
+                        response = self.linsock.recv(20000)
+                    except self.linsock.timeout:
+                        print("Connection with detonation chamber has timed out")
+                        self.conn.close()
+                        endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        self.logsock.send("SESSION;{};{};{};{};{}".format(starttime, endtime, ip, 'telnet', remoteport))
+                        return
+                    self.conn.send(response)
+
+
+                else:
+                    self.linsock.sendall("echo 'command not found'")
+
+
+    def stop(self):
+        self.linsock.close()
+        self.conn.close()
+
+
 
 
 
@@ -133,7 +171,7 @@ class telnet_ctrl(threading.Thread):
         self.port = 23
         self.buff = 4096
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.settimeout(240)
+        self.sock.settimeout(30)
         self.det = det
         detaddrs = open("siren.config", mode="r")
         addrs = detaddrs.read()
@@ -154,6 +192,7 @@ class telnet_ctrl(threading.Thread):
 
     def run(self):
         self.sock.listen(5)
+        self.threads = []
         while 1:
             try:
                 newconn = self.sock.accept()
@@ -161,6 +200,7 @@ class telnet_ctrl(threading.Thread):
                 try:
                     th = telnetServerThread(newconn, self.linaddr, self.winaddr, self.det)
                     th.start()
+                    self.threads.append(th)
                 except socket.error:
                     print("Socket error")
                     sys.exit()
@@ -173,7 +213,7 @@ class telnet_ctrl(threading.Thread):
                 self.sock.close()
                 sys.exit()
 
-        self.sock.close()
-
     def stop(self):
+        for th in self.threads:
+            th.stop()
         self.sock.close()
