@@ -92,6 +92,7 @@ class telnetServerThread(threading.Thread):
                             response = self.linsock.recv(20000)
                         except socket.timeout:
                             print("Connection with host has timed out")
+                            self.linsock.close()
                             return
                         self.conn.send(response)
                     elif data[:2] == 'ls' and self.det == 'l':
@@ -100,6 +101,7 @@ class telnetServerThread(threading.Thread):
                             response = self.linsock.recv(20000)
                         except socket.timeout:
                             print("Connection with host has timed out")
+                            self.linsock.close()
                             return
                         self.conn.send(response)
                     elif data[:5] == 'touch' and self.det == 'l':
@@ -110,6 +112,7 @@ class telnetServerThread(threading.Thread):
                             response = self.linsock.recv(20000)
                         except socket.timeout:
                             print("Connection with host has timed out")
+                            self.linsock.close()
                             return
                         self.conn.send(response)
                     else:
@@ -118,7 +121,7 @@ class telnetServerThread(threading.Thread):
                 print("Connection closed")
                 return
 
-        self.linsock.close()
+
 
 
 

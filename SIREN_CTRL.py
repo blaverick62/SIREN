@@ -73,11 +73,11 @@ def main():
         telnet_thread.stop()
         sys.exit()
 
-
+    line = sys.stdin.read()
     while 1:
         try:
-            leave = raw_input("Enter exit to quit >>\n")
-            if leave == "exit":
+            line = sys.stdin.read()
+            if line == "exit":
                 telnet_thread.stop()
                 sys.exit()
         except KeyboardInterrupt:
@@ -87,7 +87,7 @@ def main():
             break
         except Exception:
             telnet_thread.stop()
-
+            break
 
 
 if __name__ == "__main__":
