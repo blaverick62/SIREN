@@ -112,5 +112,4 @@ echo json_encode($dataout);
 //close connection
 $conn->close();
 
-//now print the data
 ?>

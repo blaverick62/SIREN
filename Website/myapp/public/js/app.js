@@ -14,7 +14,7 @@ $(document).ready(function(){
             var successes = JSON.parse(data[2]);
             var ips = JSON.parse(data[3]);
             var commands = JSON.parse(data[4]);
-	    var starttimes = JSON.parse(data[5]);
+	        var starttimes = JSON.parse(data[5]);
 
             var ipcount = [];
             var uniqueips = [];
@@ -227,44 +227,94 @@ $(document).ready(function(){
                 }
             });
 
+            console.log(starttimes[0]);
+
             var dates = [];
-            var dt;
+            var newformat;
+            var reggie = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/;
+            var dateArray = [];
+            var dateObject;
             for(i=0; i < starttimes.length; i++){
-                dt  = starttimes[i].split(/\-|\s/);
-                dates.push(new Date(dt.slice(0,3).reverse().join('-') + ' ' + dt[3]));
+                newformat = new Date(starttimes[i]);
+                dates.push(newformat);
+                /*dateArray = reggie.exec(dateString);
+                dateObject = new Date(
+                    (+dateArray[1]),
+                    (+dateArray[2])-1, // Careful, month starts at 0!
+                    (+dateArray[3]),
+                    (+dateArray[4]),
+                    (+dateArray[5]),
+                    (+dateArray[6])
+                );*/
             }
 
             var rollback = 4;
             var hours = [];
             var split = 1;
             var points = rollback / split;
-            console.log(dates[0]);
-            console.log(dates[2]);
-            var mostrecent = dates[dates.length - 1];
+            var mostrecent = new Date(dates[dates.length - 1].valueOf());
             var timesplits = [];
+            var timelabels = [];
+            var next;
             timesplits.push(mostrecent);
-            for(i = 0; i < points - 1; i++){
-                prev = timesplits[i].getHours;
-                console.log(prev);
-                timesplits.push(timesplits[i].setHours(prev - 1));
+            for(i = 1; i < points - 1; i++){
+                next = new Date(mostrecent.valueOf());
+                next.setHours(next.getHours() - i);
+                timesplits.push(next);
+                timelabels.push(next.toString());
             }
 
+            var splitdata = [];
+            for(i=0; i < timesplits.length - 1; i++){
+                splitdata.push(0);
+            }
+            console.log("Most recent");
+            console.log(mostrecent);
+            console.log("Dates below");
+            for(i=0; i < dates.length; i++){
+                console.log(dates[i])
+                for(j=1; j<timesplits.length; j++){
+                    if(dates[i] <= timesplits[j - 1] && dates[i] > timesplits[j]){
+                        splitdata[j - 1]++;
+                    }
+                }
+            }
 
+            console.log(timesplits)
+
+            console.log(splitdata);
+
+            var loginoptions = {
+                scales:{
+                    yAxes:[{
+                        display: true,
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
+                    xAxes:[{
+                        display:true,
+                        ticks: {
+                            reverse: true
+                        }
+                    }]
+                }
+            };
 
             var loginchart = $("#loginfrequency");
-                        new Chart(loginchart, {
-                                type: 'line',
-                                data: {
-                                    labels: uniquehours,
-                                    datasets : [{
-                                        label: 'Login Frequency by Time',
-                                        backgroundColor: 'rgba( 51, 255, 215 , 0.75)',
-                                        borderColor: 'rgba(200, 200, 200, 0.75)',
-                                        data: hrcount
-                                    }]
-                                },
-                options: options
-                        });
+            new Chart(loginchart, {
+                type: 'line',
+                data: {
+                    labels: timelabels,
+                    datasets : [{
+                        label: 'Login Frequency by Time',
+                        backgroundColor: 'rgba( 51, 255, 215 , 0.75)',
+                        borderColor: 'rgba(200, 200, 200, 0.75)',
+                        data: splitdata
+                    }]
+                },
+                options: loginoptions
+            });
 
 		},
 		error: function(ts) {
