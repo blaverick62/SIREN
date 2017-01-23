@@ -7,7 +7,11 @@ $(document).ready(function(){
         contentType: "application/json; charset=utf-8",
         dataType: "json",
 		success: function(data) {
-			//$("#test").html(data);
+
+			//***************************************************
+            // Data Acquisition
+            //***************************************************
+
             console.log(data);
             var usernames = JSON.parse(data[0]);
             var passwords = JSON.parse(data[1]);
@@ -15,6 +19,15 @@ $(document).ready(function(){
             var ips = JSON.parse(data[3]);
             var commands = JSON.parse(data[4]);
 	        var starttimes = JSON.parse(data[5]);
+            var cmdsessionids = JSON.parse(data[6]);
+            var cmdtimes = JSON.parse(data[7]);
+            var sessionids = JSON.parse(data[8]);
+
+
+            //***************************************************
+            //  IP Address Frequency Chart
+            //***************************************************
+
 
             var ipcount = [];
             var uniqueips = [];
@@ -67,6 +80,12 @@ $(document).ready(function(){
                 options: options
 			});
 
+
+            //***************************************************
+            // Username Frequency Chart
+            //***************************************************
+
+
             var uscount = [];
             var uniqueusers = [];
             var unus = 0;
@@ -102,6 +121,11 @@ $(document).ready(function(){
 			            },
                 options: options
 			});
+
+            //***************************************************
+            // Password Frequency Chart
+            //***************************************************
+
 
             var passcount = [];
             var uniquepass = [];
@@ -139,6 +163,10 @@ $(document).ready(function(){
                 options: options
 			});
 
+            //***************************************************
+            // Success Chart
+            //***************************************************
+
             var good = 0;
             var bad = 0;
             for(i = 0; i < successes.length; i++){
@@ -166,11 +194,32 @@ $(document).ready(function(){
                 }
             });
 
-            var cmdlist = "<li>Commands Entered:</li>";
+            //***************************************************
+            // Command Table
+            //***************************************************
+            var cmdips = [];
+            for(i=0; i<cmdsessionids.length; i++){
+                for(j=0; j<sessionids.length; j++){
+                    if(cmdsessionids[i] == sessionids[j]){
+                        cmdips.push(ips[j]);
+                    }
+                }
+            }
+
+            console.log("ips from commands")
+            console.log(cmdips);
+
+            var cmdlist = "<tr><td>Command</td><td>Source IP Address</td><td>Time Stamp</td></tr>";
             for(i = 0; i < commands.length; i++){
-                cmdlist = cmdlist + "<li>" + commands[i] + "</li>";
+                cmdlist = cmdlist + "<tr><td>" + commands[i] + "</td><td>" + cmdips[i] + "</td><td>" + cmdtimes[i] + "</td></tr>";
             }
             $('#input').html(cmdlist);
+
+
+            //***************************************************
+            // Password Percentage Chart
+            //***************************************************
+
 
             var percount = [];
             var uniquepassper = [];
@@ -229,6 +278,11 @@ $(document).ready(function(){
 
             console.log(starttimes[0]);
 
+
+            //***************************************************
+            // Login Frequency Chart
+            //***************************************************
+
             var dates = [];
             var newformat;
             var reggie = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/;
@@ -237,15 +291,6 @@ $(document).ready(function(){
             for(i=0; i < starttimes.length; i++){
                 newformat = new Date(starttimes[i]);
                 dates.push(newformat);
-                /*dateArray = reggie.exec(dateString);
-                dateObject = new Date(
-                    (+dateArray[1]),
-                    (+dateArray[2])-1, // Careful, month starts at 0!
-                    (+dateArray[3]),
-                    (+dateArray[4]),
-                    (+dateArray[5]),
-                    (+dateArray[6])
-                );*/
             }
 
             var rollback = 4;

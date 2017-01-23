@@ -76,12 +76,46 @@ if ($result=mysqli_query($conn,$querycmd))
     mysqli_free_result($result);
 }
 
+$querycmdid = sprintf("SELECT session_id FROM INPUT;");
+$datacmdid = array();
+if ($result=mysqli_query($conn,$querycmdid))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $datacmdid[] = $row[0];
+    }
+  // Free result set
+    mysqli_free_result($result);
+}
+
+$querycmdtimes = sprintf("SELECT timestmp FROM INPUT;");
+$datacmdtimes = array();
+if ($result=mysqli_query($conn,$querycmdtimes))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $datacmdtimes[] = $row[0];
+    }
+  // Free result set
+    mysqli_free_result($result);
+}
+
 $querylogstart = sprintf("SELECT  starttime FROM SESSION;");
 $datalogstart = array();
 if ($result=mysqli_query($conn,$querylogstart))
   {
   while($row=mysqli_fetch_row($result)){
 	$datalogstart[] = $row[0];
+  }
+  mysqli_free_result($result);
+}
+
+$querysessionid = sprintf("SELECT session_id FROM SESSION;");
+$datasessionid = array();
+if ($result=mysqli_query($conn,$querysessionid))
+  {
+  while($row=mysqli_fetch_row($result)){
+	$datasessionid[] = $row[0];
   }
   mysqli_free_result($result);
 }
@@ -95,6 +129,9 @@ $passwords = json_encode($datapass);
 $successes = json_encode($datasucc);
 $ips =  json_encode($dataip);
 $cmds = json_encode($datacmd);
+$cmdids = json_encode($datacmdid);
+$cmdtimes = json_encode($datacmdtimes);
+$sessionids = json_encode($datasessionid);
 $starttime = json_encode($datalogstart);
 
 $dataout = array();
@@ -104,6 +141,9 @@ $dataout[2] = $successes;
 $dataout[3] = $ips;
 $dataout[4] = $cmds;
 $dataout[5] = $starttime;
+$dataout[6] = $cmdids;
+$dataout[7] = $cmdtimes;
+$dataout[8] = $sessionids;
 
 echo json_encode($dataout);
 

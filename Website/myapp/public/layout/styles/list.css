@@ -2,8 +2,37 @@ h1{
     font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
-li {
+h3.graph-label{
     font-family: Verdana, Arial, Helvetica, sans-serif;
-    list-style-type: none;
+}
+
+table {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    border: 1px solid black;
     font-size: 20px;
+    background-color: mintcream;
+}
+
+td{
+    border: 1px solid black;
+    padding: 2px;
+    background-color: mintcream;
+}
+
+canvas.bar{
+    padding-top: 0;
+}
+
+div.graph-container{
+    background-color: mintcream;
+    padding-top: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-bottom: 4px;
+    border-style: solid;
+    border-color: bisque;
+}
+
+html{
+    background-color: beige;
 }

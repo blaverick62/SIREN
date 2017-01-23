@@ -15,6 +15,7 @@ File: Layout CSS
 html{overflow-y:scroll;}
 body{margin:0; padding:0; font-size:12px; font-family:verdana, Arial, Helvetica, sans-serif; color:#FFFFFF; background-color:#29313C;}
 
+
 .justify{text-align:justify;}
 .bold{font-weight:bold;}
 .center{text-align:center;}
