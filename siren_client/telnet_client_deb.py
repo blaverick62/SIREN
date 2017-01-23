@@ -25,7 +25,6 @@ class telnetClientThread(threading.Thread):
                 print(cmd)
                 if cmd == "TERMINATE":
                     print("Session closed")
-                    self.conn.close()
                     return
                 if cmd[:2] == 'cd':
                     currpath = os.getcwd()
@@ -64,8 +63,4 @@ while 1:
         sys.exit()
     except socket.timeout:
         print("Connection with SIREN has timed out")
-    line = sys.stdin.read()
-    if line == "exit":
-        for i in threads:
-            i.stop()
-        sys.exit()
+
