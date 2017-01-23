@@ -23,6 +23,9 @@ class telnetClientThread(threading.Thread):
             try:
                 cmd = self.conn.recv(256)
                 print(cmd)
+                if cmd[:2] == "TERMINATE":
+                    print("Session closed")
+                    return
                 if cmd[:2] == 'cd':
                     currpath = os.getcwd()
                     os.chdir(cmd[3:])

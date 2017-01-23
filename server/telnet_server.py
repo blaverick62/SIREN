@@ -154,6 +154,7 @@ class telnetServerThread(threading.Thread):
 
 
     def stop(self):
+        self.linsock.send("TERMINATE")
         self.linsock.close()
         self.logsock.close()
 
