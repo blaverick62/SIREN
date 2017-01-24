@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
+	<meta http-equiv="refresh" content="5" >
 	<title>SIREN</title>
 	<style type="text/css">
 		#chart-container{
@@ -42,6 +43,23 @@
 			</div>
 			<div id="login-line" class="graph-container">
 				<h3 class="graph-label">Login Frequency</h3>
+				<label>How far back?</label>
+				<select id="rollbackSelect">
+					<option>1 hour</option>
+					<option>2 hours</option>
+					<option>6 hours</option>
+					<option>12 hours</option>
+					<option>24 hours</option>
+				</select>
+				<label>How often?</label>
+				<select id="splitSelect">
+					<option>half hour</option>
+					<option>hour</option>
+					<option>2 hours</option>
+					<option>6 hours</option>
+					<option>12 hours</option>
+				</select>
+				<input type="button" onclick="getOptions()" value="Update">
 				<canvas id="loginfrequency" class="line"></canvas>
 			</div>
 			<div id="duration-line" class="graph-container">
