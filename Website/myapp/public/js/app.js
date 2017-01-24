@@ -299,18 +299,24 @@ $(document).ready(function(){
             var points = rollback / split;
             var mostrecent = new Date(dates[dates.length - 1].valueOf());
             var timesplits = [];
-            var timelabels = [];
+            var templabels = [];
             var next;
-            timesplits.push(mostrecent);
-            for(i = 1; i < points - 1; i++){
+            for(i = 0; i < points; i++){
                 next = new Date(mostrecent.valueOf());
                 next.setHours(next.getHours() - i);
                 timesplits.push(next);
-                timelabels.push(next.toString());
+                templabels.push(next);
+            }
+
+            var timelabels = [];
+            var friendlydate;
+            for(i=0; i<templabels.length; i++){
+                friendlydate = (templabels[i].getMonth() + 1) + '/' + templabels[i].getDay() + '/' + templabels[i].getFullYear() + ' ' + templabels[i].getHours() + ':' + templabels[i].getMinutes();
+                timelabels.push(friendlydate);
             }
 
             var splitdata = [];
-            for(i=0; i < timesplits.length - 1; i++){
+            for(i=0; i < timesplits.length; i++){
                 splitdata.push(0);
             }
             console.log("Most recent");
@@ -319,14 +325,14 @@ $(document).ready(function(){
             for(i=0; i < dates.length; i++){
                 console.log(dates[i])
                 for(j=1; j<timesplits.length; j++){
-                    if(dates[i] <= timesplits[j - 1] && dates[i] > timesplits[j]){
-                        splitdata[j - 1]++;
+                    if(dates[i].getTime() <= timesplits[j - 1].getTime() && dates[i].getTime() > timesplits[j].getTime()){
+                        splitdata[j - 1] = splitdata[j-1] + 1;
                     }
                 }
             }
 
-            console.log(timesplits)
-
+            console.log(timesplits);
+            console.log(timelabels);
             console.log(splitdata);
 
             var loginoptions = {
@@ -335,12 +341,20 @@ $(document).ready(function(){
                         display: true,
                         ticks: {
                             beginAtZero: true
+                        },
+                        scalelabel:{
+                          display: true,
+                          labelstring: 'Time'
                         }
                     }],
                     xAxes:[{
                         display:true,
                         ticks: {
                             reverse: true
+                        },
+                        scalelabel:{
+                            display: true,
+                            labelstring: 'Number of Sessions'
                         }
                     }]
                 }

@@ -23,6 +23,11 @@ canvas.bar{
     padding-top: 0;
 }
 
+canvas.line{
+    padding: 0px;
+    width: 600px;
+}
+
 div.graph-container{
     background-color: mintcream;
     padding-top: 4px;
@@ -31,6 +36,7 @@ div.graph-container{
     padding-bottom: 4px;
     border-style: solid;
     border-color: bisque;
+    width: 600px;
 }
 
 html{
