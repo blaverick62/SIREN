@@ -120,6 +120,16 @@ if ($result=mysqli_query($conn,$querysessionid))
   mysqli_free_result($result);
 }
 
+$querylogend = sprintf("SELECT endtime FROM SESSION;");
+$datalogend = array();
+if ($result=mysqli_query($conn,$querylogend))
+  {
+  while($row=mysqli_fetch_row($result)){
+	$datalogend[] = $row[0];
+  }
+  mysqli_free_result($result);
+}
+
 //$querypass = sprintf("SELECT passwd FROM AUTH;");
 
 //$resultpass = $conn->query($querypass);
@@ -133,6 +143,7 @@ $cmdids = json_encode($datacmdid);
 $cmdtimes = json_encode($datacmdtimes);
 $sessionids = json_encode($datasessionid);
 $starttime = json_encode($datalogstart);
+$endtime = json_encode($datalogend);
 
 $dataout = array();
 $dataout[0] = $usernames;
@@ -144,6 +155,7 @@ $dataout[5] = $starttime;
 $dataout[6] = $cmdids;
 $dataout[7] = $cmdtimes;
 $dataout[8] = $sessionids;
+$dataout[9] = $endtime;
 
 echo json_encode($dataout);
 

@@ -22,6 +22,7 @@ $(document).ready(function(){
             var cmdsessionids = JSON.parse(data[6]);
             var cmdtimes = JSON.parse(data[7]);
             var sessionids = JSON.parse(data[8]);
+            var endtimes = JSON.parse(data[9]);
 
 
             //***************************************************
@@ -285,7 +286,6 @@ $(document).ready(function(){
 
             var dates = [];
             var newformat;
-            var reggie = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/;
             var dateArray = [];
             var dateObject;
             for(i=0; i < starttimes.length; i++){
@@ -297,7 +297,7 @@ $(document).ready(function(){
             var hours = [];
             var split = 1;
             var points = rollback / split;
-            var mostrecent = new Date(dates[dates.length - 1].valueOf());
+            var mostrecent = new Date();
             var timesplits = [];
             var templabels = [];
             var next;
@@ -310,20 +310,20 @@ $(document).ready(function(){
 
             var timelabels = [];
             var friendlydate;
-            for(i=0; i<templabels.length; i++){
+            for(i=0; i<templabels.length - 1; i++){
                 friendlydate = (templabels[i].getMonth() + 1) + '/' + templabels[i].getDay() + '/' + templabels[i].getFullYear() + ' ' + templabels[i].getHours() + ':' + templabels[i].getMinutes();
                 timelabels.push(friendlydate);
             }
 
             var splitdata = [];
-            for(i=0; i < timesplits.length; i++){
+            for(i=0; i < timesplits.length - 1; i++){
                 splitdata.push(0);
             }
             console.log("Most recent");
             console.log(mostrecent);
             console.log("Dates below");
             for(i=0; i < dates.length; i++){
-                console.log(dates[i])
+                console.log(dates[i]);
                 for(j=1; j<timesplits.length; j++){
                     if(dates[i].getTime() <= timesplits[j - 1].getTime() && dates[i].getTime() > timesplits[j].getTime()){
                         splitdata[j - 1] = splitdata[j-1] + 1;
@@ -374,6 +374,68 @@ $(document).ready(function(){
                 },
                 options: loginoptions
             });
+
+            //***************************************************************
+            // Live Login Duration chart
+            //***************************************************************
+
+            var pointlabels = [];
+            var durations = [];
+            var tempstart;
+            var tempenddate;
+            var tempend;
+            for(i=0; i<dates.length; i++){
+                friendlydate = (dates[i].getMonth() + 1) + '/' + dates[i].getDay() + '/' + dates[i].getFullYear() + ' ' + dates[i].getHours() + ':' + dates[i].getMinutes();
+                pointlabels.push(friendlydate);
+                tempstart = dates[i].getTime() / 1000;
+                tempenddate = new Date(endtimes[i]);
+                tempend = tempenddate.getTime() / 1000;
+                durations.push(tempend - tempstart);
+            }
+
+            var durationoptions = {
+                scales:{
+                    yAxes:[{
+                        display: true,
+                        ticks: {
+                            beginAtZero: true
+                        },
+                        scalelabel:{
+                          display: true,
+                          labelstring: 'Time (seconds)'
+                        }
+                    }],
+                    xAxes:[{
+                        display:true,
+                        ticks: {
+                            reverse: true
+                         },
+                        scalelabel:{
+                            display: true,
+                            labelstring: 'Sessions (Time started)'
+                        }
+                    }]
+                }
+            };
+
+            var durationchart = $("#durations");
+            new Chart(durationchart, {
+                type: 'line',
+                data: {
+                    labels: pointlabels,
+                    datasets : [{
+                        label: 'Duration of Attack in Seconds',
+                        backgroundColor: 'rgba( 51, 255, 215 , 0.75)',
+                        borderColor: 'rgba(200, 200, 200, 0.75)',
+                        data: durations
+                    }]
+                },
+                options: durationoptions
+            });
+
+
+
+
 
 		},
 		error: function(ts) {
