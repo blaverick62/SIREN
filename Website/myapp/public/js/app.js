@@ -294,26 +294,31 @@ $(document).ready(function(){
             }
 
 
-
-            function getOptions() {
-                var rollback = document.getElementById("rollbackSelect");
-                var split = document.getElementById("splitSelect");
-                if (rollback == "1 hour"){rollback = 1;}
-                if (rollback == "2 hours"){rollback = 2;}
-                if (rollback == "6 hours"){rollback = 6;}
-                if (rollback == "12 hours"){rollback = 12;}
-                if (rollback == "24 hours"){rollback = 24;}
-                if (split == "half hour"){split = 0.5;}
-                if (split == "hour"){split = 1;}
-                if (split == "2 hours"){split = 2;}
-                if (split == "6 hours"){split = 6;}
-                if (split == "12 hours"){split = 12;}
-                var points = rollback/split;
-                return points;
-            }
-
             var hours = [];
-            var points = getOptions();
+            $("#updatebutton").click(function(){
+                location.reload();
+            });
+
+            var temproll = document.getElementById("rollbackSelect");
+            var tempsplit = document.getElementById("splitSelect");
+            var rollback = temproll.options[temproll.selectedIndex].value;
+            var split = tempsplit.options[tempsplit.selectedIndex].value;
+            /*if (rollback == "1 hour"){rollback = 1;}
+            if (rollback == "2 hours"){rollback = 2;}
+            if (rollback == "6 hours"){rollback = 6;}
+            if (rollback == "12 hours"){rollback = 12;}
+            if (rollback == "24 hours"){rollback = 24;}
+            if (split == "half hour"){split = 0.5;}
+            if (split == "hour"){split = 1;}
+            if (split == "2 hours"){split = 2;}
+            if (split == "6 hours"){split = 6;}
+            if (split == "12 hours"){split = 12;}*/
+            var points = rollback/split;
+            console.log(rollback);
+            console.log(split);
+            console.log(points);
+
+
             var mostrecent = new Date();
             var timesplits = [];
             var templabels = [];
