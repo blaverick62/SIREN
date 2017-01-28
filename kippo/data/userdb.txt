@@ -1,2 +1,0 @@
-root:0:password123
-guest:0:password
