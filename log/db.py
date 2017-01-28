@@ -12,11 +12,11 @@ import threading, MySQLdb
 
 class logger_store(threading.Thread):
 
-    def __init__(self, buffer, mutex, username, password):
+    def __init__(self, buffer, mutex, ip, username, password):
         threading.Thread.__init__(self)
         self.buffer = buffer
         self.mutex = mutex
-        self.db = MySQLdb.connect(host="localhost",
+        self.db = MySQLdb.connect(host=ip,
                                   user=username,
                                   passwd=password,
                                   db="siren_db")

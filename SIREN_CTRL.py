@@ -10,49 +10,42 @@
 # and can record data on the attacker.                      #
 #############################################################
 
-from server.http_server import *
-from server.ftp_server import *
 from server.telnet_server import *
 from log.logger import *
 
 
-import subprocess, sys, os, signal
+import sys
 
-# Clean up kippo exit
-def knode_start():
-    os.chdir('kippo')
-    print("Starting Kippo Honeypot...")
-    kipStart = "twistd -y kippo.tac -l log/kippo.log --pidfile kippo.pid"
-    subprocess.Popen(kipStart.split())
-    os.chdir('..')
-    print("Kippo Running in Background...")
-
-def knode_stop():
-    os.chdir('kippo')
-    subprocess.call(['./stop.sh'])
-    os.chdir('..')
+def ipCheck(ip):
+    iparr = ip.split('.')
+    if iparr.length != 4:
+        return 0
+    for n in iparr:
+        if int(n) < 0 and int(n) > 255:
+            return 0
+    return 1
 
 def main():
     config = open("siren.config", mode='w')
-    linaddr = str(raw_input("What is the IP address of the Linux Detonation Chamber? >> "))
+    linaddr = '256.256.256.256'
+    while ipCheck(linaddr) == 0:
+        linaddr = str(raw_input("What is the IP address of the Linux Detonation Chamber? >> "))
+        if ipCheck(linaddr) == 0:
+            print("Invalid IP address. Please try again.")
     config.write(linaddr + '\n')
     #winaddr = str(raw_input("What is the IP address of the Windows Detonation Chamber? >> "))
     winaddr = '0.0.0.0'
     config.write(winaddr + '\n')
     config.close()
 
-    #det = str(raw_input("w for windows, l for linux > "))
-    #username = str(raw_input("What is your username? > "))
-    #password = str(raw_input("What is your password? > "))
-
-    siren_log = logger('sirenlocal', 'sirenproj')
+    dbAddr = '256.256.256.256'
+    while ipCheck(dbAddr) == 0:
+        dbAddr = str(raw_input("What is the IP address of the database? >> "))
+        if ipCheck(dbAddr) == 0:
+            print("Invalid IP address. Please try again.")
+    siren_log = logger(dbAddr, 'sirenlocal', 'sirenproj')
     siren_log.setDaemon(True)
 
-    #http_thread = http_ctrl()
-    #http_thread.setDaemon(True)
-
-    #ftp_thread = ftp_ctrl()
-    #ftp_thread.setDaemon(True)
 
     telnet_thread = telnet_ctrl('l')
     telnet_thread.setDaemon(True)
@@ -63,13 +56,9 @@ def main():
 
     try:
         pass
-        #http_thread.start()
-        #ftp_thread.start()
         siren_log.start()
         telnet_thread.start()
     except KeyboardInterrupt:
-        #http_thread.stop()
-        #ftp_thread.stop()
         telnet_thread.stop()
         sys.exit()
 

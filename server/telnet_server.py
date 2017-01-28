@@ -37,10 +37,11 @@ class telnetServerThread(threading.Thread):
 
         # Authorization and brute force logger
         self.starttime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.destip = socket.gethostbyname(socket.gethostname())
         ip = self.addr[0]
         remoteport = self.addr[1]
         self.endtime = self.starttime
-        self.logsock.send("SESSION;{};{};{};{};{};{}".format(self.starttime, self.endtime, ip, 'telnet', 23, remoteport))
+        self.logsock.send("SESSION;{};{};{};{};{};{}".format(self.starttime, self.endtime, ip, self.destip, 'telnet', 23, remoteport))
         success = 0
         tries = 0
         try:
@@ -184,7 +185,7 @@ class telnet_ctrl(threading.Thread):
         print("Detonation chamber at %s..." % self.linaddr)
         detaddrs.close()
         try:
-            print("Starting Telnet Server at %s..." % socket.gethostname())
+            print("Starting Telnet Server at %s..." % socket.gethostbyname(socket.gethostname()))
             self.sock.bind(('', self.port))
         except Exception as e:
             print("Telnet Server failed to bind to port...")

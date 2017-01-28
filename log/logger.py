@@ -15,12 +15,12 @@ from db import logger_store
 
 class logger(threading.Thread):
 
-    def __init__(self, username, password):
+    def __init__(self, ip, username, password):
         threading.Thread.__init__(self)
         self.buffer = Queue.Queue()
         self.mutex = Lock()
         self.sock = logger_sock(self.buffer, self.mutex)
-        self.store = logger_store(self. buffer, self.mutex, username, password)
+        self.store = logger_store(self. buffer, self.mutex, ip, username, password)
 
     def run(self):
         self.sock.start()
