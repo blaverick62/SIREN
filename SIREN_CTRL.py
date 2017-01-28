@@ -18,10 +18,10 @@ import sys
 
 def ipCheck(ip):
     iparr = ip.split('.')
-    if iparr.length != 4:
+    if len(iparr) != 4:
         return 0
     for n in iparr:
-        if int(n) < 0 and int(n) > 255:
+        if int(n) < 0 or int(n) > 255:
             return 0
     return 1
 

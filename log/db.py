@@ -38,7 +38,7 @@ class logger_store(threading.Thread):
                     if args[0] == "SESSION":
                         with open('log/log.txt', mode='a') as f:
                             f.write("{}: Client connected from address {}\n".format(args[1], args[3]))
-                        self.cursor.execute("insert into SESSION values(NULL,'{}','{}','{}','{}',{},{});".format(args[1], args[2], args[3], args[4], args[5], args[6]))
+                        self.cursor.execute("insert into SESSION values(NULL,'{}','{}','{}','{}','{}',{},{});".format(args[1], args[2], args[3], args[4], args[5], args[6], args[7]))
                     if args[0] == "UPDATE":
                         with open('log/log.txt', mode='a') as f:
                             f.write("Client closed connection at time {}\n".format(args[1]))
