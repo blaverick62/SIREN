@@ -191,6 +191,9 @@ class ssh_ctrl(threading.Thread):
 
             chan.settimeout(30)
             chan.send('\r\n\r\nWelcome to Ubuntu 16.04\r\n\r\n')
+            self.linsock.send('pwd')
+            response = self.linsock.recv(256)
+            chan.send(response)
             while True:
                 try:
                     data = chan.recv(256)
