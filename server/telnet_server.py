@@ -22,7 +22,7 @@ class telnetServerThread(threading.Thread):
         self.logsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # winconn = self.winsock.connect((winaddr, 23))
         try:
-            self.logsock.connect(('127.0.0.1', 1337))
+            self.logsock.connect(('127.0.0.1', 13337))
         except socket.error:
             print("Failed to connect to logging facility")
         try:

@@ -13,6 +13,7 @@
 from server.telnet_server import *
 from server.ssh_server import *
 from log.logger import *
+from time import sleep
 from os import chmod
 from Crypto.PublicKey import RSA
 
@@ -52,14 +53,16 @@ def main():
         dbAddr = str(raw_input("What is the IP address of the database? >> "))
         if ipCheck(dbAddr) == 0:
             print("Invalid IP address. Please try again.")
+
     siren_log = logger(dbAddr, 'sirenlocal', 'sirenproj')
     siren_log.setDaemon(True)
-
+    sleep(5)
 
     ssh_thread = ssh_ctrl(pubkey)
     ssh_thread.setDaemon(True)
 
     #telnet_thread = telnet_ctrl('l')
+
     #telnet_thread.setDaemon(True)
 
 

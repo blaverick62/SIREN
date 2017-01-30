@@ -106,27 +106,26 @@ class SSHInterface(paramiko.ServerInterface):
 class ssh_ctrl(threading.Thread):
 
     def __init__(self, pubkey):
+        threading.Thread.__init__(self)
         self.pubkey = pubkey
         detaddrs = open("siren.config", mode="r")
         addrs = detaddrs.read()
         spaddrs = addrs.split('\n')
         linaddr = spaddrs[0]
-        print(linaddr)
-        try:
-            self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.connect((linaddr, 23))
-        except Exception as e:
-            print("Failed to connect to detonation chamber " + str(e))
-            traceback.print_exc()
-            sys.exit(1)
-        print("Detonation chamber at %s..." % linaddr)
         detaddrs.close()
+        self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.logsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.logsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # winconn = self.winsock.connect((winaddr, 23))
         try:
-            self.logsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.connect(('127.0.0.1', 1337))
-        except Exception as e:
-            print("Failed to connect to logging facility " + str(e))
-            traceback.print_exc()
+            self.logsock.connect(('127.0.0.1', 13337))
+        except socket.error:
+            print("Failed to connect to logging facility")
+            sys.exit(1)
+        try:
+            self.linsock.connect((linaddr, 23))
+        except socket.error:
+            print("Failed to connect to detonation chamber")
             sys.exit(1)
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -137,7 +136,7 @@ class ssh_ctrl(threading.Thread):
             traceback.print_exc()
             sys.exit(1)
         print("SSH server at " + socket.gethostbyname(socket.gethostname()))
-        threading.Thread.__init__(self)
+
 
     def run(self):
         try:
@@ -231,7 +230,7 @@ class ssh_ctrl(threading.Thread):
                         chan.send(response)
 
 
-                    elif data[:2] == 'ls' and self.det == 'l':
+                    elif data[:2] == 'ls':
                         self.linsock.sendall(data)
                         try:
                             response = self.linsock.recv(20000)
@@ -244,7 +243,7 @@ class ssh_ctrl(threading.Thread):
                         chan.send(response)
 
 
-                    elif data[:5] == 'touch' and self.det == 'l':
+                    elif data[:5] == 'touch':
                         self.linsock.sendall(data)
 
 

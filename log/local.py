@@ -17,11 +17,12 @@ class logger_sock(threading.Thread):
         self.bufferList = buffer
         self.mutex = mutex
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind(('localhost', 1337))
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.bind(('127.0.0.1', 13337))
 
 
     def run(self):
-        self.sock.listen(5)
+        self.sock.listen(50)
         while (1):
             try:
                 th = logger_receive(self.sock.accept(), self.bufferList, self.mutex)
