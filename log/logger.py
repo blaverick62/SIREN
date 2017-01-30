@@ -9,7 +9,8 @@
 
 import threading, Queue
 from threading import Lock
-from local import logger_sock
+from local import tel_logger_sock
+from local import ssh_logger_sock
 from db import logger_store
 
 
@@ -19,15 +20,18 @@ class logger(threading.Thread):
         threading.Thread.__init__(self)
         self.buffer = Queue.Queue()
         self.mutex = Lock()
-        self.sock = logger_sock(self.buffer, self.mutex)
+        self.telsock = tel_logger_sock(self.buffer, self.mutex)
+        self.sshsock = ssh_logger_sock(self.buffer, self.mutex)
         self.store = logger_store(self. buffer, self.mutex, ip, username, password)
 
     def run(self):
-        self.sock.start()
+        self.telsock.start()
+        self.sshsock.start()
         self.store.start()
 
     def stop(self):
-        self.sock.stop()
+        self.telsock.stop()
+        self.sshsock.stop()
 
 
 

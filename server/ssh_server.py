@@ -115,12 +115,12 @@ class ssh_ctrl(threading.Thread):
         detaddrs.close()
         self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.logsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.logsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # winconn = self.winsock.connect((winaddr, 23))
         try:
-            self.logsock.connect(('127.0.0.1', 13337))
-        except socket.error:
-            print("Failed to connect to logging facility")
+            self.logsock.connect(('127.0.0.1', 1338))
+        except socket.error as e:
+            print("Failed to connect to logging facility" + str(e))
+            traceback.print_exc()
             sys.exit(1)
         try:
             self.linsock.connect((linaddr, 23))
