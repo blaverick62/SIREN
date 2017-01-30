@@ -11,8 +11,10 @@
 #############################################################
 
 from server.telnet_server import *
+from server.ssh_server import *
 from log.logger import *
-
+from os import chmod
+from Crypto.PublicKey import RSA
 
 import sys
 
@@ -26,6 +28,13 @@ def ipCheck(ip):
     return 1
 
 def main():
+    key = RSA.generate(2048)
+    with open('/root/sirenprivate.key', mode='w') as content_file:
+        chmod('/root/sirenprivate.key', 0600)
+        content_file.write(key.exportKey('PEM'))
+    pubkeyobj = key.publickey()
+    pubkey = pubkeyobj.exportKey('OpenSSH')
+
     config = open("siren.config", mode='w')
     linaddr = '256.256.256.256'
     while ipCheck(linaddr) == 0:
@@ -47,35 +56,36 @@ def main():
     siren_log.setDaemon(True)
 
 
-    telnet_thread = telnet_ctrl('l')
-    telnet_thread.setDaemon(True)
+    ssh_thread = ssh_ctrl(pubkey)
+    ssh_thread.setDaemon(True)
 
-
+    #telnet_thread = telnet_ctrl('l')
+    #telnet_thread.setDaemon(True)
 
 
 
     try:
         pass
         siren_log.start()
-        telnet_thread.start()
+        ssh_thread.start()
+        #telnet_thread.start()
     except KeyboardInterrupt:
-        telnet_thread.stop()
+        #telnet_thread.stop()
         sys.exit()
 
-    line = sys.stdin.read()
     while 1:
         try:
             line = sys.stdin.read()
             if line == "exit":
-                telnet_thread.stop()
+                #telnet_thread.stop()
                 sys.exit()
         except KeyboardInterrupt:
             #http_thread.stop()
             #ftp_thread.stop()
-            telnet_thread.stop()
+            #telnet_thread.stop()
             break
         except Exception:
-            telnet_thread.stop()
+            #telnet_thread.stop()
             break
 
 

@@ -194,7 +194,7 @@ class telnet_ctrl(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        self.sock.listen(5)
+        self.sock.listen(50)
         self.threads = []
         while 1:
             try:
