@@ -29,12 +29,8 @@ def ipCheck(ip):
     return 1
 
 def main():
-    key = RSA.generate(2048)
-    with open('/root/sirenprivate.key', mode='w') as content_file:
-        chmod('/root/sirenprivate.key', 0600)
-        content_file.write(key.exportKey('PEM'))
-    pubkeyobj = key.publickey()
-    pubkey = pubkeyobj.exportKey('OpenSSH')
+    with open('sirenpublic.key', mode='r') as content_file:
+        pubkey = content_file.readline()
 
     config = open("siren.config", mode='w')
     linaddr = '256.256.256.256'
@@ -56,7 +52,8 @@ def main():
 
     siren_log = logger(dbAddr, 'sirenlocal', 'sirenproj')
     siren_log.setDaemon(True)
-    sleep(5)
+    siren_log.start()
+    sleep(10)
 
     ssh_thread = ssh_ctrl(pubkey)
     ssh_thread.setDaemon(True)
@@ -68,8 +65,6 @@ def main():
 
 
     try:
-        pass
-        siren_log.start()
         ssh_thread.start()
         #telnet_thread.start()
     except KeyboardInterrupt:

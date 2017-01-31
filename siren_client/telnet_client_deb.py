@@ -20,25 +20,22 @@ class telnetClientThread(threading.Thread):
 
     def run(self):
         while True:
-            try:
-                cmd = self.conn.recv(256)
-                print(cmd)
-                if cmd == "TERMINATE":
-                    print("Session closed")
-                    return
-                if cmd[:2] == 'cd':
-                    currpath = os.getcwd()
-                    os.chdir(cmd[3:])
-                    if os.getcwd() == currpath:
-                        cmdout = "bash: cd: %s: No such file or directory"
-                        self.conn.send(cmdout)
-                else:
-                    proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-                    cmdout = proc.stdout.read()
-                    self.conn.send(cmdout)
-            except socket.timeout:
-                print("Connection with SIREN has timed out")
+            cmd = self.conn.recv(256)
+            print(cmd)
+            if cmd == "TERMINATE":
+                print("Session closed")
                 return
+            if cmd[:2] == 'cd':
+                currpath = os.getcwd()
+                os.chdir(cmd[3:])
+                if os.getcwd() == currpath:
+                    cmdout = "bash: cd: %s: No such file or directory"
+                    self.conn.send(cmdout)
+            else:
+                proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                cmdout = proc.stdout.read()
+                self.conn.send(cmdout)
+
 
     def stop(self):
         self.conn.close()
@@ -47,7 +44,6 @@ class telnetClientThread(threading.Thread):
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 telsock.bind(('', 23))
 telsock.listen(5)
-telsock.settimeout(30)
 threads = []
 
 while 1:
@@ -61,6 +57,4 @@ while 1:
         for i in threads:
             i.stop()
         sys.exit()
-    except socket.timeout:
-        print("Connection with SIREN has timed out")
 
