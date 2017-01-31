@@ -12,6 +12,7 @@
 
 
 from binascii import hexlify
+from time import sleep
 
 import base64
 import datetime
@@ -97,7 +98,6 @@ class SSHInterface(paramiko.ServerInterface):
 
     def check_channel_shell_request(self, channel):
         self.event.set()
-        
         print("SHELL REQUESTED")
         return True
 
@@ -198,11 +198,37 @@ class ssh_ctrl(threading.Thread):
                 sys.exit(1)
 
 
-            #chan.send('\r\n\r\nWelcome to Ubuntu 16.04\r\n\r\n')
-            #self.linsock.send('pwd')
-            #response = self.linsock.recv(256)
-            #chan.send(response + '\r\n')
-            #chan.send('ubuntu~$ ')
+            chan.send('\r\n\r\nWelcome to Ubuntu 16.04\r\n\r\n')
+            self.linsock.send('pwd')
+            response = self.linsock.recv(256)
+            chan.send(response + '\r\n')
+            while True:
+                chan.send('ubuntu:~$ ')
+                data = ""
+                while chan.recv_ready() == False:
+                    pass
+                while '\r' not in data:
+                    rec = chan.recv(256)
+                    if rec == '\b':
+                        data = data[:-1]
+                    else:
+                        data = data + rec
+                    chan.send(rec)
+                chan.send('\n')
+                print(data)
+                if data[:-1] == "exit":
+                    self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
+                    self.linsock.send("TERMINATE")
+                    chan.close()
+                    sys.exit(0)
+                timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, data))
+                self.linsock.sendall(data[:-1])
+                response = self.linsock.recv(2048)
+                response = '\r\n'.join(response.split('\n'))
+                chan.send(response)
+
             #while True:
             #    try:
             #        data = chan.recv(256)
