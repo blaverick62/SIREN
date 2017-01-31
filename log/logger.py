@@ -22,7 +22,7 @@ class logger(threading.Thread):
         self.mutex = Lock()
         self.telsock = tel_logger_sock(self.buffer, self.mutex)
         self.sshsock = ssh_logger_sock(self.buffer, self.mutex)
-        self.store = logger_store(self. buffer, self.mutex, ip, username, password)
+        self.store = logger_store(self.buffer, self.mutex, ip, username, password)
 
     def run(self):
         self.telsock.start()

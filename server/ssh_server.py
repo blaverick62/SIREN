@@ -27,13 +27,13 @@ class SSHInterface(paramiko.ServerInterface):
 
     def __init__(self, pubkey, starttime):
 
-        self.hostkey = paramiko.RSAKey(filename='/root/sirenprivate.key')
+        self.hostkey = paramiko.RSAKey(filename='sirenprivate.key')
         self.pubkey = paramiko.RSAKey(data=base64.b64decode(pubkey[7:]))
         self.event = threading.Event()
         self.starttime = starttime
         try:
             self.logsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.logsock.connect(('127.0.0.1', 1337))
+            self.logsock.connect(('127.0.0.1', 1338))
         except Exception as e:
             print("Failed to connect to logging facility in paramiko server: " + str(e))
             traceback.print_exc()
