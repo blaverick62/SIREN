@@ -44,6 +44,8 @@ class SSHInterface(paramiko.ServerInterface):
             return paramiko.OPEN_SUCCEEDED
         return paramiko.OPEN_FAILED_ADMINISTRATIVELY_PROHIBITED
 
+
+
     def check_auth_password(self, username, password):
         with open('server/users.txt', mode='r') as users:
             for line in users:
@@ -95,10 +97,17 @@ class SSHInterface(paramiko.ServerInterface):
 
     def check_channel_shell_request(self, channel):
         self.event.set()
+        
+        print("SHELL REQUESTED")
         return True
 
     def check_channel_pty_request(self, channel, term, width, height, pixelwidth, pixelheight,
                                   modes):
+        return True
+
+    def check_channel_exec_request(self, channel, command):
+        print(command)
+        self.event.set()
         return True
 
 
@@ -188,87 +197,88 @@ class ssh_ctrl(threading.Thread):
                 print('*** Client never asked for a shell.')
                 sys.exit(1)
 
-            chan.settimeout(30)
-            chan.send('\r\n\r\nWelcome to Ubuntu 16.04\r\n\r\n')
-            self.linsock.send('pwd')
-            response = self.linsock.recv(256)
-            chan.send(response)
-            while True:
-                try:
-                    data = chan.recv(256)
-                except socket.timeout:
-                    print("Attacker closed connection")
-                    self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
-                    continue
-                timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                data = data[:-2]
-                if len(data) > 0:
-                    if data[0] == "'":
-                        print("SQL Injection detected! Isolating threat...")
-                        with open('threatlog.txt', mode='a') as threatlog:
-                            threatlog.write(ip + ": " + data + '\n')
-                    else:
-                        self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, data))
-                    print(data)
-                    # self.winconn.sendall(data)
+
+            #chan.send('\r\n\r\nWelcome to Ubuntu 16.04\r\n\r\n')
+            #self.linsock.send('pwd')
+            #response = self.linsock.recv(256)
+            #chan.send(response + '\r\n')
+            #chan.send('ubuntu~$ ')
+            #while True:
+            #    try:
+            #        data = chan.recv(256)
+            #    except socket.timeout:
+            #        print("Attacker closed connection")
+            #        self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            #        self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
+            #        continue
+            #    timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            #    data = data[:-2]
+            #    if len(data) > 0:
+            #        if data[0] == "'":
+            #            print("SQL Injection detected! Isolating threat...")
+            #            with open('threatlog.txt', mode='a') as threatlog:
+            #                threatlog.write(ip + ": " + data + '\n')
+            #        else:
+            #            self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, data))
+            #        print(data)
+            #        # self.winconn.sendall(data)
 
 
-                    if data[:2] == 'cd':
-                        self.linsock.sendall(data)
+            #        if data[:2] == 'cd':
+            #            self.linsock.sendall(data)
 
 
-                    elif data[:3] == 'pwd':
-                        self.linsock.sendall(data)
-                        try:
-                            response = self.linsock.recv(20000)
-                        except socket.timeout:
-                            print("Connection with detonation chamber has timed out")
-                            self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                            self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
-                            return
-                        chan.send(response)
+            #        elif data[:3] == 'pwd':
+            #            self.linsock.sendall(data)
+            #            try:
+            #                response = self.linsock.recv(20000)
+            #            except socket.timeout:
+            #                print("Connection with detonation chamber has timed out")
+            #                self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            #                self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
+            #                return
+            #            chan.send(response)
 
 
-                    elif data[:2] == 'ls':
-                        self.linsock.sendall(data)
-                        try:
-                            response = self.linsock.recv(20000)
-                        except socket.timeout:
-                            print("Connection with detonation chamber has timed out")
-                            self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                            self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
-                            self.linsock.close()
-                            return
-                        chan.send(response)
+            #        elif data[:2] == 'ls':
+            #            self.linsock.sendall(data)
+            #            try:
+            #                response = self.linsock.recv(20000)
+            #            except socket.timeout:
+            #                print("Connection with detonation chamber has timed out")
+            #                self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            #                self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
+            #                self.linsock.close()
+            #                return
+            #            chan.send(response)
 
 
-                    elif data[:5] == 'touch':
-                        self.linsock.sendall(data)
+            #        elif data[:5] == 'touch':
+            #            self.linsock.sendall(data)
 
 
-                    elif data[:4] == 'echo':
-                        self.linsock.sendall(data)
-                        try:
-                            response = self.linsock.recv(20000)
-                        except socket.timeout:
-                            print("Connection with detonation chamber has timed out")
-                            self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                            self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
-                            return
-                        chan.send(response)
+            #        elif data[:4] == 'echo':
+            #            self.linsock.sendall(data)
+            #            try:
+            #                response = self.linsock.recv(20000)
+            #            except socket.timeout:
+            #                print("Connection with detonation chamber has timed out")
+            #                self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            #                self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
+            #                return
+            #            chan.send(response)
 
 
-                    else:
-                        self.linsock.sendall("echo 'command not found'")
-                        try:
-                            response = self.linsock.recv(20000)
-                        except socket.timeout:
-                            print("Connection with detonation chamber has timed out")
-                            self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                            self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
-                            return
-                        chan.send(response)
+            #        else:
+            #            self.linsock.sendall("echo 'command not found'")
+            #            try:
+            #                response = self.linsock.recv(20000)
+            #            except socket.timeout:
+            #                print("Connection with detonation chamber has timed out")
+            #                self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            #                self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
+            #                return
+            #            chan.send(response)
 
         except Exception as e:
             print('SSH Caught exception: ' + str(e.__class__) + ': ' + str(e))
