@@ -149,7 +149,7 @@ class ssh_ctrl(threading.Thread):
             remoteport = addr[1]
             self.endtime = self.starttime
             self.logsock.send(
-                "SESSION;{};{};{};{};{};{}".format(self.starttime, self.endtime, ip, self.destip, 'ssh', 22,
+                "SESSION;{};{};{};{};{};{};{}".format(self.starttime, self.endtime, ip, self.destip, 'ssh', 22,
                                                    remoteport))
             print(addr[0])
         except Exception as e:

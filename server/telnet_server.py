@@ -41,7 +41,7 @@ class telnetServerThread(threading.Thread):
         ip = self.addr[0]
         remoteport = self.addr[1]
         self.endtime = self.starttime
-        self.logsock.send("SESSION;{};{};{};{};{};{}".format(self.starttime, self.endtime, ip, self.destip, 'telnet', 23, remoteport))
+        self.logsock.send("SESSION;{};{};{};{};{};{};{}".format(self.starttime, self.endtime, ip, self.destip, 'telnet', 23, remoteport))
         success = 0
         tries = 0
         try:

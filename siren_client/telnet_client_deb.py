@@ -20,21 +20,25 @@ class telnetClientThread(threading.Thread):
 
     def run(self):
         while True:
-            cmd = self.conn.recv(256)
-            print(cmd)
-            if cmd == "TERMINATE":
-                print("Session closed")
-                return
-            if cmd[:2] == 'cd':
-                currpath = os.getcwd()
-                os.chdir(cmd[3:])
-                if os.getcwd() == currpath:
-                    cmdout = "bash: cd: %s: No such file or directory"
+            try:
+                cmd = self.conn.recv(256)
+                print(cmd)
+                if cmd == "TERMINATE":
+                    print("Session closed")
+                    return
+                if cmd[:2] == 'cd':
+                    currpath = os.getcwd()
+                    os.chdir(cmd[3:])
+                    if os.getcwd() == currpath:
+                        cmdout = "bash: cd: %s: No such file or directory"
+                        self.conn.send(cmdout)
+                else:
+                    proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                    cmdout = proc.stdout.read()
                     self.conn.send(cmdout)
-            else:
-                proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-                cmdout = proc.stdout.read()
-                self.conn.send(cmdout)
+            except self.conn.timeout:
+                print("SIREN connection has timed out")
+                return
 
 
     def stop(self):
