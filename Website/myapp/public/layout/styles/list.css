@@ -17,6 +17,7 @@ td{
     border: 1px solid black;
     padding: 2px;
     background-color: mintcream;
+    width=80px;
 }
 
 canvas.bar{
