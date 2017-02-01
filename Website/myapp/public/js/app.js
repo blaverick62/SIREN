@@ -26,7 +26,7 @@ $(document).ready(function(){
             var destips = JSON.parse(data[10]);
             var protocols = JSON.parse(data[11]);
             var localports = JSON.parse(data[12]);
-            var remoteports = JSON.parse(data[12]);
+            var remoteports = JSON.parse(data[13]);
 
             //***************************************************
             //  IP Address Frequency Chart
