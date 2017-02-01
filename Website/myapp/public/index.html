@@ -18,6 +18,16 @@
 	<script type="text/javascript" src="js/angular.min.js"></script>
 	<script type="text/javascript" src="js/ang.js"></script>
 	<script type="text/javascript" src="js/app.js"></script>
+	<input class="ip-bar-choice" type="checkbox" value="1" onchange="valueChanged()"/>
+	<script type="text/javascript">
+		function valueChanged()
+		{
+			if($('.ip-bar-choice').is(":checked"))
+				$("#ip-bar").show();
+			else
+				$("#ip-bar").hide();
+		}
+	</script>
 	<div>
 		<div id="chart-container">
 			<div id="ip-bar" class="graph-container" >
