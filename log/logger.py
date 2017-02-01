@@ -7,7 +7,7 @@
 # text and MySQL logging facility                           #
 #############################################################
 
-import threading, Queue
+import threading, Queue, sys
 from threading import Lock
 from local import tel_logger_sock
 from local import ssh_logger_sock
@@ -32,6 +32,8 @@ class logger(threading.Thread):
     def stop(self):
         self.telsock.stop()
         self.sshsock.stop()
+        self.store.stop()
+        sys.exit(0)
 
 
 

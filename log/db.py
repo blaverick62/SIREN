@@ -7,7 +7,7 @@
 # text and MySQL logging facility                           #
 #############################################################
 
-import threading, MySQLdb
+import threading, MySQLdb, sys
 
 
 class logger_store(threading.Thread):
@@ -46,12 +46,26 @@ class logger_store(threading.Thread):
                     if args[0] == "INPUT":
                         with open('log/log.txt', mode='a') as f:
                             f.write("{}: {} entered command: {}\n".format(args[2], args[1], args[3]))
-                        id = self.cursor.execute("select session_id from SESSION where starttime='{}';".format(args[1]))
+                        self.cursor.execute("select session_id from SESSION where starttime='{}';".format(args[1]))
+                        id = self.cursor.fetchone()[0]
+                        print(id)
+                        row = self.cursor.fetchone()
+                        while row is not None:
+                            row = self.cursor.fetchone()
                         self.cursor.execute("insert into INPUT values(NULL,{},'{}','{}')".format(id,args[2],args[3]))
                     if args[0] == "AUTH":
-                        id = self.cursor.execute("select session_id from SESSION where starttime='{}'".format(args[1]))
+                        self.cursor.execute("select session_id from SESSION where starttime='{}';".format(args[1]))
+                        id = self.cursor.fetchone()[0]
+                        print(id)
+                        row = self.cursor.fetchone()
+                        while row is not None:
+                            row = self.cursor.fetchone()
                         self.cursor.execute("insert into AUTH values(NULL,{},{},'{}','{}','{}')".format(id,args[2],args[3],args[4],args[5]))
 
                     self.db.commit()
                 except KeyboardInterrupt:
                     print("Closing MySQL connection...")
+
+    def stop(self):
+        self.cursor.close()
+        sys.exit(0)

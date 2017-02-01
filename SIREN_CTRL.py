@@ -71,20 +71,21 @@ def main():
         #telnet_thread.stop()
         sys.exit()
 
-    while 1:
-        try:
-            line = sys.stdin.read()
-            if line == "exit":
+    try:
+        while 1:
+            try:
+                line = sys.stdin.read()
+                if line == "exit":
+                    #telnet_thread.stop()
+                    sys.exit()
+            except Exception:
                 #telnet_thread.stop()
-                sys.exit()
-        except KeyboardInterrupt:
-            #http_thread.stop()
-            #ftp_thread.stop()
-            #telnet_thread.stop()
-            break
-        except Exception:
-            #telnet_thread.stop()
-            break
+                break
+    except KeyboardInterrupt:
+        print("Keyboard interrupt caught in main")
+        #ssh_thread.stop()
+        #siren_log.stop()
+        sys.exit(0)
 
 
 if __name__ == "__main__":

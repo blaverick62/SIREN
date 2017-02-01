@@ -12,6 +12,7 @@
 
 
 from binascii import hexlify
+import netifaces as ni
 from time import sleep
 
 import base64
@@ -111,19 +112,15 @@ class SSHInterface(paramiko.ServerInterface):
         return True
 
 
+class ssh_thread(threading.Thread):
 
-class ssh_ctrl(threading.Thread):
-
-    def __init__(self, pubkey):
+    def __init__(self, (client, addr), linaddr, pubkey):
         threading.Thread.__init__(self)
-        self.pubkey = pubkey
-        detaddrs = open("siren.config", mode="r")
-        addrs = detaddrs.read()
-        spaddrs = addrs.split('\n')
-        linaddr = spaddrs[0]
-        detaddrs.close()
         self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.logsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client = client
+        self.addr = addr
+        self.pubkey = pubkey
         # winconn = self.winsock.connect((winaddr, 23))
         try:
             self.logsock.connect(('127.0.0.1', 1338))
@@ -136,43 +133,13 @@ class ssh_ctrl(threading.Thread):
         except socket.error:
             print("Failed to connect to detonation chamber")
             sys.exit(1)
-        try:
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            self.sock.bind(('',22))
-        except Exception as e:
-            print("SSH bind failed " + str(e))
-            traceback.print_exc()
-            sys.exit(1)
-        print("SSH server at " + socket.gethostbyname(socket.gethostname()))
-
 
     def run(self):
-        try:
-            self.sock.listen(50)
-            client, addr = self.sock.accept()
-            # Authorization and brute force logger
-            self.starttime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            self.destip = socket.gethostbyname(socket.gethostname())
-            ip = addr[0]
-            remoteport = addr[1]
-            self.endtime = self.starttime
-            self.logsock.send(
-                "SESSION;{};{};{};{};{};{};{}".format(self.starttime, self.endtime, ip, self.destip, 'ssh', 22,
-                                                   remoteport))
-            print(addr[0])
-        except Exception as e:
-            print('SSH Listen/accept failed: ' + str(e))
-            traceback.print_exc()
-            sys.exit(1)
-        except KeyboardInterrupt:
-            print("Keyboard interrupt caught")
-            sys.exit(0)
-
         DoGSSAPIKeyExchange = True
+        self.starttime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         sshServer = SSHInterface(self.pubkey, self.starttime)
         try:
-            t = paramiko.Transport(client, gss_kex=DoGSSAPIKeyExchange)
+            t = paramiko.Transport(self.client, gss_kex=DoGSSAPIKeyExchange)
             t.set_gss_host(socket.getfqdn(""))
             try:
                 t.load_server_moduli()
@@ -186,9 +153,17 @@ class ssh_ctrl(threading.Thread):
                 print('SSH negotiation failed.')
                 sys.exit(1)
 
-            chan = t.accept()
+            self.destip = ni.ifaddresses('ens33')[2][0]['addr']
+            ip = t.getpeername()[0]
+            remoteport = self.addr[1]
+            self.endtime = self.starttime
+            self.logsock.send(
+                "SESSION;{};{};{};{};{};{};{}".format(self.starttime, self.endtime, ip, self.destip, 'ssh', 22,
+                                                      remoteport))
+            print(ip)
+            self.chan = t.accept()
 
-            if chan is None:
+            if self.chan is None:
                 print("No channel")
                 sys.exit(1)
 
@@ -197,122 +172,115 @@ class ssh_ctrl(threading.Thread):
                 print('*** Client never asked for a shell.')
                 sys.exit(1)
 
-
-            chan.send('\r\n\r\nWelcome to Ubuntu 16.04\r\n\r\n')
+            self.chan.send('\r\n\r\nWelcome to Ubuntu 16.04\r\n\r\n')
             self.linsock.send('pwd')
             response = self.linsock.recv(256)
-            chan.send(response + '\r\n')
+            self.chan.send(response + '\r\n')
             while True:
-                chan.send('ubuntu:~$ ')
+                self.chan.send('ubuntu:~$ ')
                 data = ""
-                while chan.recv_ready() == False:
+                while self.chan.recv_ready() == False:
                     pass
                 while '\r' not in data:
-                    rec = chan.recv(256)
+                    rec = self.chan.recv(256)
                     if rec == '\b':
                         data = data[:-1]
                     else:
                         data = data + rec
-                    chan.send(rec)
-                chan.send('\n')
+                    self.chan.send(rec)
+                self.chan.send('\n')
                 print(data)
                 if data[:-1] == "exit":
                     self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
+                    sleep(1)
                     self.linsock.send("TERMINATE")
-                    chan.close()
+                    self.logsock.send("TERMINATE")
+                    self.chan.close()
                     sys.exit(0)
                 timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, data))
+                clean = data.strip('\'')
+                self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, clean))
                 self.linsock.sendall(data[:-1])
                 response = self.linsock.recv(2048)
                 response = '\r\n'.join(response.split('\n'))
-                chan.send(response)
-
-            #while True:
-            #    try:
-            #        data = chan.recv(256)
-            #    except socket.timeout:
-            #        print("Attacker closed connection")
-            #        self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            #        self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
-            #        continue
-            #    timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            #    data = data[:-2]
-            #    if len(data) > 0:
-            #        if data[0] == "'":
-            #            print("SQL Injection detected! Isolating threat...")
-            #            with open('threatlog.txt', mode='a') as threatlog:
-            #                threatlog.write(ip + ": " + data + '\n')
-            #        else:
-            #            self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, data))
-            #        print(data)
-            #        # self.winconn.sendall(data)
-
-
-            #        if data[:2] == 'cd':
-            #            self.linsock.sendall(data)
-
-
-            #        elif data[:3] == 'pwd':
-            #            self.linsock.sendall(data)
-            #            try:
-            #                response = self.linsock.recv(20000)
-            #            except socket.timeout:
-            #                print("Connection with detonation chamber has timed out")
-            #                self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            #                self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
-            #                return
-            #            chan.send(response)
-
-
-            #        elif data[:2] == 'ls':
-            #            self.linsock.sendall(data)
-            #            try:
-            #                response = self.linsock.recv(20000)
-            #            except socket.timeout:
-            #                print("Connection with detonation chamber has timed out")
-            #                self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            #                self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
-            #                self.linsock.close()
-            #                return
-            #            chan.send(response)
-
-
-            #        elif data[:5] == 'touch':
-            #            self.linsock.sendall(data)
-
-
-            #        elif data[:4] == 'echo':
-            #            self.linsock.sendall(data)
-            #            try:
-            #                response = self.linsock.recv(20000)
-            #            except socket.timeout:
-            #                print("Connection with detonation chamber has timed out")
-            #                self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            #                self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
-            #                return
-            #            chan.send(response)
-
-
-            #        else:
-            #            self.linsock.sendall("echo 'command not found'")
-            #            try:
-            #                response = self.linsock.recv(20000)
-            #            except socket.timeout:
-            #                print("Connection with detonation chamber has timed out")
-            #                self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            #                self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
-            #                return
-            #            chan.send(response)
+                self.chan.send(response)
 
         except Exception as e:
             print('SSH Caught exception: ' + str(e.__class__) + ': ' + str(e))
             traceback.print_exc()
             self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
+            sleep(1)
+            self.linsock.send("TERMINATE")
+            self.logsock.send("TERMINATE")
             try:
                 t.close()
             except:
                 pass
             sys.exit(1)
+        except KeyboardInterrupt:
+            print("Keyboard interrupt caught in handler thread")
+            self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
+            sleep(1)
+            self.linsock.send("TERMINATE")
+            self.logsock.send("TERMINATE")
+            self.chan.close()
+            sys.exit(0)
+
+    def stop(self):
+        self.chan.close()
+        sys.exit(0)
+
+        
+
+class ssh_ctrl(threading.Thread):
+
+    def __init__(self, pubkey):
+        threading.Thread.__init__(self)
+        self.pubkey = pubkey
+        detaddrs = open("siren.config", mode="r")
+        addrs = detaddrs.read()
+        spaddrs = addrs.split('\n')
+        self.linaddr = spaddrs[0]
+        detaddrs.close()
+        try:
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.sock.bind(('',22))
+        except Exception as e:
+            print("SSH bind failed " + str(e))
+            traceback.print_exc()
+            sys.exit(1)
+        print("SSH server at " + ni.ifaddresses('ens33')[2][0]['addr'])
+
+
+    def run(self):
+        self.threads = []
+        try:
+            while 1:
+                try:
+                    self.sock.listen(50)
+                    newconn = self.sock.accept()
+                    th = ssh_thread(newconn, self.linaddr, self.pubkey)
+                    self.threads.append(th)
+                    th.start()
+
+                except Exception as e:
+                    print('SSH Listen/accept failed: ' + str(e))
+                    traceback.print_exc()
+                    for i in self.threads:
+                        i.stop()
+                    sys.exit(1)
+        except KeyboardInterrupt:
+            print("Keyboard interrupt caught in control thread")
+            for i in self.threads:
+                i.stop()
+            sys.exit(0)
+
+    def stop(self):
+        for i in self.threads:
+            i.stop()
+        sys.exit(0)
+
+        

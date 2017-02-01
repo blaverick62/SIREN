@@ -7,7 +7,7 @@
 # communication within siren                                #
 #############################################################
 
-import threading, socket
+import threading, socket, sys
 
 
 class tel_logger_sock(threading.Thread):
@@ -23,9 +23,11 @@ class tel_logger_sock(threading.Thread):
 
     def run(self):
         self.telsock.listen(50)
+        self.threads = []
         while (1):
             try:
                 th = logger_receive(self.telsock.accept(), self.bufferList, self.mutex)
+                self.threads.append(th)
                 th.start()
             except socket.error:
                 print("Socket closed.")
@@ -36,7 +38,10 @@ class tel_logger_sock(threading.Thread):
         self.telsock.close()
 
     def stop(self):
+        for i in self.threads:
+            i.stop()
         self.telsock.close()
+        sys.exit(0)
 
 
 class ssh_logger_sock(threading.Thread):
@@ -51,9 +56,11 @@ class ssh_logger_sock(threading.Thread):
 
     def run(self):
         self.sshsock.listen(50)
+        self.threads = []
         while (1):
             try:
                 th = logger_receive(self.sshsock.accept(), self.bufferList, self.mutex)
+                self.threads.append(th)
                 th.start()
             except socket.error:
                 print("Socket closed.")
@@ -64,8 +71,10 @@ class ssh_logger_sock(threading.Thread):
         self.sshsock.close()
 
     def stop(self):
+        for i in self.threads:
+            i.stop()
         self.sshsock.close()
-
+        sys.exit(0)
 
 class logger_receive(threading.Thread):
 
@@ -80,6 +89,8 @@ class logger_receive(threading.Thread):
         while 1:
             try:
                 data = self.conn.recv(4096)
+                if data == "TERMINATE":
+                    return
                 self.mutex.acquire()
                 try:
                     self.buffer.put(data)
@@ -91,3 +102,6 @@ class logger_receive(threading.Thread):
             except KeyboardInterrupt:
                 print("Closing logging...")
                 break
+
+    def stop(self):
+        sys.exit(0)
