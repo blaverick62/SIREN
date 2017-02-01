@@ -2,7 +2,7 @@
 //setting header to json
 header('Content-Type: application/json');
 
-$servername = "localhost";
+$servername = "";
 $username = "sirenlocal";
 $password = "sirenproj";
 $db_name = "siren_db";
