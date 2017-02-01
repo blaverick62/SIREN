@@ -18,9 +18,13 @@
 	<script type="text/javascript" src="js/angular.min.js"></script>
 	<script type="text/javascript" src="js/ang.js"></script>
 	<script type="text/javascript" src="js/app.js"></script>
-	<input class="ip-bar-choice" type="checkbox" value="1" onchange="valueChanged()"/>
+
+	<input class="ip-bar-choice" type="checkbox" checked onchange="valueChangedIPBar()">IP Address Hits<br>
+
+
+
 	<script type="text/javascript">
-		function valueChanged()
+		function valueChangedIPBar()
 		{
 			if($('.ip-bar-choice').is(":checked"))
 				$("#ip-bar").show();
