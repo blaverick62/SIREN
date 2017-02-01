@@ -52,7 +52,7 @@ if ($result=mysqli_query($conn,$querysucc))
     mysqli_free_result($result);
 }
 
-$queryip = sprintf("SELECT ip FROM SESSION;");
+$queryip = sprintf("SELECT sourceip FROM SESSION;");
 $dataip = array();
 if ($result=mysqli_query($conn,$queryip))
     {
@@ -130,6 +130,54 @@ if ($result=mysqli_query($conn,$querylogend))
   mysqli_free_result($result);
 }
 
+$querydestip = sprintf("SELECT destinationip FROM SESSION;");
+$destip = array();
+if ($result=mysqli_query($conn,$querydestip))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $destip[] = $row[0];
+    }
+  // Free result set
+    mysqli_free_result($result);
+}
+
+$queryprot = sprintf("SELECT protocol FROM SESSION;");
+$dataprot = array();
+if ($result=mysqli_query($conn,$queryprot))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $dataprot[] = $row[0];
+    }
+  // Free result set
+    mysqli_free_result($result);
+}
+
+$querysrc = sprintf("SELECT localport FROM SESSION;");
+$datasrc = array();
+if ($result=mysqli_query($conn,$querysrc))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $datasrc[] = $row[0];
+    }
+  // Free result set
+    mysqli_free_result($result);
+}
+
+$queryrem = sprintf("SELECT remoteport FROM SESSION;");
+$datarem = array();
+if ($result=mysqli_query($conn,$queryrem))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $datarem[] = $row[0];
+    }
+  // Free result set
+    mysqli_free_result($result);
+}
+
 //$querypass = sprintf("SELECT passwd FROM AUTH;");
 
 //$resultpass = $conn->query($querypass);
@@ -144,6 +192,10 @@ $cmdtimes = json_encode($datacmdtimes);
 $sessionids = json_encode($datasessionid);
 $starttime = json_encode($datalogstart);
 $endtime = json_encode($datalogend);
+$destips = json_encode($destip);
+$protocol = json_encode($dataprot);
+$localport = json_encode($datasrc);
+$remoteport = json_encode($datarem);
 
 $dataout = array();
 $dataout[0] = $usernames;
@@ -156,6 +208,10 @@ $dataout[6] = $cmdids;
 $dataout[7] = $cmdtimes;
 $dataout[8] = $sessionids;
 $dataout[9] = $endtime;
+$dataout[10] = $destips;
+$dataout[11] = $protocol;
+$dataout[12] = $localport;
+$dataout[13] = $remoteport;
 
 echo json_encode($dataout);
 

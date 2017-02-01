@@ -23,7 +23,10 @@ $(document).ready(function(){
             var cmdtimes = JSON.parse(data[7]);
             var sessionids = JSON.parse(data[8]);
             var endtimes = JSON.parse(data[9]);
-
+            var destips = JSON.parse(data[10]);
+            var protocols = JSON.parse(data[11]);
+            var localports = JSON.parse(data[12]);
+            var remoteports = JSON.parse(data[12]);
 
             //***************************************************
             //  IP Address Frequency Chart
@@ -199,10 +202,18 @@ $(document).ready(function(){
             // Command Table
             //***************************************************
             var cmdips = [];
+            var cmdprotocols = [];
+            var cmddests = [];
+            var cmdlocports = [];
+            var cmdremports = [];
             for(i=0; i<cmdsessionids.length; i++){
                 for(j=0; j<sessionids.length; j++){
                     if(cmdsessionids[i] == sessionids[j]){
                         cmdips.push(ips[j]);
+                        cmddests.push(destips[j]);
+                        cmdprotocols.push(protocols[j]);
+                        cmdlocports.push(localports[j]);
+                        cmdremports.push(remoteports[j]);
                     }
                 }
             }
@@ -210,9 +221,9 @@ $(document).ready(function(){
             console.log("ips from commands")
             console.log(cmdips);
 
-            var cmdlist = "<tr><td>Command</td><td>Source IP Address</td><td>Time Stamp</td></tr>";
+            var cmdlist = "<tr><td>Command</td><td>Source IP Address</td><td>Destination IP Address</td><td>Protocol</td><td>Local Port</td><td>Remote Port</td><td>Time Stamp</td></tr>";
             for(i = 0; i < commands.length; i++){
-                cmdlist = cmdlist + "<tr><td>" + commands[i] + "</td><td>" + cmdips[i] + "</td><td>" + cmdtimes[i] + "</td></tr>";
+                cmdlist = cmdlist+"<tr><td>"+commands[i]+"</td><td>"+cmdips[i]+"</td><td>"+cmddests[i]+"</td><td>"+cmdprotocols[i]+"</td><td>"+cmdlocports[i]+"</td><td>"+cmdremports[i]+"</td><td>"+cmdtimes[i]+"</td></tr>";
             }
             $('#input').html(cmdlist);
 
