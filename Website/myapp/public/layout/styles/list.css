@@ -1,13 +1,56 @@
+
 h1{
-    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-family: Verdana, sans-serif;
+    color: limegreen;
 }
 
 h3.graph-label{
-    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-family: Verdana, sans-serif;
+    margin: 0px;
+}
+
+.topnav {
+    background-color: forestgreen;
+    height: 40px;
+    vertical-align: center;
+}
+
+.topnav li{
+    display: inline;
+    line-height: 40px;
+    padding: 10px;
+
+}
+
+.active {
+    background-color: #73AD21;
+}
+
+label {
+    color: white;
+}
+
+li:hover {
+    background-color: #73AD21;
+}
+
+a:link {
+    text-decoration: none;
+    color: white;
+}
+
+a:visited {
+    text-decoration: none;
+    color: white;
+}
+
+#table-label{
+    color: white;
+    padding-left: 10px;
 }
 
 table {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-family: Verdana, sans-serif;
     border: 1px solid black;
     font-size: 20px;
     background-color: mintcream;
@@ -29,17 +72,45 @@ canvas.line{
     width: 600px;
 }
 
+.choice-container{
+    float: right;
+    width: 350px;
+    border: 3px solid #73AD21;
+    font-family: Verdana, sans-serif;
+}
+
+.chart-container{
+    float: left;
+    width: 620px;
+
+}
+
 div.graph-container{
-    background-color: mintcream;
+    display:none;
+    background-color: darkseagreen;
     padding-top: 4px;
     padding-left: 6px;
     padding-right: 6px;
     padding-bottom: 4px;
     border-style: solid;
-    border-color: bisque;
+    border-color: darkgreen;
+    width: 600px;
+    margin: 0px;
+}
+
+div.pie-container{
+    display:none;
+    background-color: darkseagreen;
+    padding-top: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-bottom: 4px;
+    border-style: solid;
+    border-color: darkgreen;
     width: 600px;
 }
 
 html{
-    background-color: beige;
+    background-color: black;
+    font-family: Verdana, sans-serif;
 }
