@@ -56,6 +56,7 @@ class SSHInterface(paramiko.ServerInterface):
                     self.logsock.send("AUTH;{};{};{};{};{}".format(self.starttime, 1, username, password,
                                                                    datetime.datetime.now().strftime(
                                                                        '%Y-%m-%d %H:%M:%S')))
+                    self.username = username
                     return paramiko.AUTH_SUCCESSFUL
             self.logsock.send("AUTH;{};{};{};{};{}".format(self.starttime, 1, username, password,
                                                            datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
@@ -173,12 +174,14 @@ class ssh_thread(threading.Thread):
                 print('*** Client never asked for a shell.')
                 sys.exit(1)
 
+            path = ("/home/admin")
             self.chan.send('\r\n\r\nWelcome to Ubuntu 16.04\r\n\r\n')
             self.linsock.send('pwd')
             response = self.linsock.recv(256)
             self.chan.send(response + '\r\n')
             while True:
-                self.chan.send('ubuntu:~$ ')
+                path.replace("/home/admin", "~")
+                self.chan.send(sshServer.username + '@ubuntu:~$ ')
                 data = ""
                 while self.chan.recv_ready() == False:
                     pass
@@ -190,8 +193,8 @@ class ssh_thread(threading.Thread):
                         data = data + rec
                     self.chan.send(rec)
                 self.chan.send('\n')
-                print(data)
-                if data[:-1] == "exit":
+                data = data[:-1]
+                if data == "exit":
                     self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
                     sleep(1)
@@ -200,12 +203,24 @@ class ssh_thread(threading.Thread):
                     self.chan.close()
                     sys.exit(0)
                 timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                clean = data.strip('\'')
-                self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, clean))
-                self.linsock.sendall(data[:-1])
-                response = self.linsock.recv(2048)
-                response = '\r\n'.join(response.split('\n'))
-                self.chan.send(response)
+                if "'" in data:
+                    print("SQL Injection detected! Isolating threat...")
+                    with open('threatlog.txt', mode='a') as threatlog:
+                        threatlog.write(ip + ": " + data + '\n')
+                else:
+                    self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, data))
+                self.linsock.sendall(data)
+                try:
+                    response = self.linsock.recv(2048)
+                except socket.timeout as e:
+                    print("Detonation chamber timed out: " + e)
+                    traceback.print_exc()
+                    sys.exit(1)
+                resplist = response.split(";")
+                path = resplist[0]
+                if len(resplist) > 1:
+                    chanresponse = '\r\n'.join(resplist[1].split('\r\n'))
+                    self.chan.send(chanresponse)
 
         except Exception as e:
             print('SSH Caught exception: ' + str(e.__class__) + ': ' + str(e))

@@ -7,7 +7,7 @@
 # servers that SIREN implements.                            #
 #############################################################
 
-import socket, threading, datetime, sys
+import socket, threading, datetime, sys, traceback
 import netifaces as ni
 
 
@@ -70,12 +70,15 @@ class telnetServerThread(threading.Thread):
             self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
             return
-        if self.det == 'l':
-            self.linsock.send("pwd")
-        else:
-            self.linsock.send('cd')
-        resp = self.linsock.recv(256)
-        self.conn.send(resp)
+        self.linsock.send("pwd")
+        try:
+            resp = self.linsock.recv(256)
+            self.conn.send(resp)
+        except socket.timeout as e:
+            print("Detonation chamber timed out: " + e)
+            traceback.print_exc()
+            sys.exit(1)
+
 
 
         # Receive loop and emulator
@@ -106,12 +109,14 @@ class telnetServerThread(threading.Thread):
                 self.linsock.sendall(data)
                 try:
                     response = self.linsock.recv(20000)
+                    resplist = response.split(";")
                 except socket.timeout:
                     print("Connection with detonation chamber has timed out")
                     self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
                     return
-                self.conn.send(response)
+                if len(resplist) > 1:
+                    self.conn.send(resplist[1])
 
 
     def stop(self):
@@ -167,7 +172,10 @@ class telnet_ctrl(threading.Thread):
                 except (socket.timeout, socket.gaierror) as e:
                     print("Exception caught: " + str(e))
                     endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    th.logsock.send("UPDATE;{};{}".format(endtime,th.starttime))
+                    try:
+                        th.logsock.send("UPDATE;{};{}".format(endtime,th.starttime))
+                    except Exception:
+                        pass
                     th.stop()
 
             except KeyboardInterrupt:

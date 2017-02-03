@@ -19,6 +19,7 @@ class telnetClientThread(threading.Thread):
 
 
     def run(self):
+        path = "/home/srodgers"
         while True:
             try:
                 cmd = self.conn.recv(256)
@@ -26,15 +27,36 @@ class telnetClientThread(threading.Thread):
                 if cmd == "TERMINATE":
                     print("Session closed")
                     return
-                if cmd[:2] == 'cd':
-                    currpath = os.getcwd()
-                    os.chdir(cmd[3:])
-                    if os.getcwd() == currpath:
-                        cmdout = "bash: cd: %s: No such file or directory"
-                        self.conn.send(cmdout)
+                if cmd[:2] == "cd":
+                    if cmd[3:] == "..":
+                        pathlist = self.path.split("/")
+                        pathlist = pathlist[-1]
+                        self.path = "/".join(pathlist)
+                        self.conn.send(path + ";")
+                    elif cmd[3:] == ".":
+                        self.conn.send(path + ";")
+                    else:
+                        if cmd[3] == '/':
+                            if os.path.isdir(cmd[3:]):
+                                if "siren" not in cmd[3:]:
+                                    path = cmd[3:]
+                                    self.conn.send(path + ";")
+                                else:
+                                    self.conn.send(path + ";" + "bash: cd: " + cmd[3:] + ": No such file or directory")
+                            else:
+                                self.conn.send("bash: cd: " + cmd[3:] + ": No such file or directory")
+                        else:
+                            if os.path.isdir(path + "/" + cmd[3:]):
+                                if "siren" not in cmd[3:]:
+                                    path = path + "/" + cmd[3:]
+                                    self.conn.send(path + ";")
+                                else:
+                                    self.conn.send(path + ";" + "bash: cd: " + cmd[3:] + ": No such file or directory")
+                            else:
+                                self.conn.send(path + ";" + "bash: cd: " + cmd[3:] + ": No such file or directory")
                 else:
-                    proc = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-                    cmdout = proc.stdout.read()
+                    proc = Popen("(" + path + " && " + cmd + ")", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                    cmdout = path + ";" + proc.stdout.read()
                     self.conn.send(cmdout)
             except self.conn.timeout:
                 print("SIREN connection has timed out")
