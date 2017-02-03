@@ -34,7 +34,8 @@ class telnetClientThread(threading.Thread):
                             pathlist = pathlist[:-1]
                         if len(pathlist) > 1:
                             path = "/".join(pathlist)
-                        path ="/" + path
+                        if path[0] != "/":
+                            path = "/" + path
                         self.conn.send(path + ";")
                     elif cmd[3:] == ".":
                         self.conn.send(path + ";")

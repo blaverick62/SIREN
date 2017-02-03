@@ -171,12 +171,8 @@ class telnet_ctrl(threading.Thread):
                     self.threads.append(th)
                 except (socket.timeout, socket.gaierror) as e:
                     print("Exception caught: " + str(e))
-                    endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    try:
-                        th.logsock.send("UPDATE;{};{}".format(endtime,th.starttime))
-                    except Exception:
-                        pass
-                    th.stop()
+                    sys.exit(0)
+
 
             except KeyboardInterrupt:
                 print("Keyboard interrupt caught")
