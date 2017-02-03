@@ -174,11 +174,14 @@ class ssh_thread(threading.Thread):
                 print('*** Client never asked for a shell.')
                 sys.exit(1)
 
-            path = ("/home/admin")
+
             self.chan.send('\r\n\r\nWelcome to Ubuntu 16.04\r\n\r\n')
             self.linsock.send('pwd')
             response = self.linsock.recv(256)
-            self.chan.send(response + '\r\n')
+            resplist = response.split(";")
+            path = resplist[0]
+            path.replace("srodgers", sshServer.username)
+            self.chan.send(path + '\r\n')
             while True:
                 path.replace("/home/admin", "~")
                 self.chan.send(sshServer.username + '@ubuntu:~$ ')
@@ -213,14 +216,16 @@ class ssh_thread(threading.Thread):
                 try:
                     response = self.linsock.recv(2048)
                 except socket.timeout as e:
-                    print("Detonation chamber timed out: " + e)
+                    print("Detonation chamber timed out: " + str(e))
                     traceback.print_exc()
                     sys.exit(1)
                 resplist = response.split(";")
                 path = resplist[0]
+                path.replace("srodgers", sshServer.username)
                 if len(resplist) > 1:
                     chanresponse = '\r\n'.join(resplist[1].split('\r\n'))
-                    self.chan.send(chanresponse)
+                    chanresponse.replace("srodgers", sshServer.username)
+                    self.chan.send(chanresponse + '\r\n')
 
         except Exception as e:
             print('SSH Caught exception: ' + str(e.__class__) + ': ' + str(e))
@@ -280,9 +285,8 @@ class ssh_ctrl(threading.Thread):
                     self.sock.listen(50)
                     newconn = self.sock.accept()
                     th = ssh_thread(newconn, self.linaddr, self.pubkey, self.iface)
-                    self.threads.append(th)
                     th.start()
-
+                    self.threads.append(th)
                 except Exception as e:
                     print('SSH Listen/accept failed: ' + str(e))
                     traceback.print_exc()

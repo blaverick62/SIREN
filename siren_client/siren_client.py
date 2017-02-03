@@ -29,9 +29,9 @@ class telnetClientThread(threading.Thread):
                     return
                 if cmd[:2] == "cd":
                     if cmd[3:] == "..":
-                        pathlist = self.path.split("/")
+                        pathlist = path.split("/")
                         pathlist = pathlist[-1]
-                        self.path = "/".join(pathlist)
+                        path = "/".join(pathlist)
                         self.conn.send(path + ";")
                     elif cmd[3:] == ".":
                         self.conn.send(path + ";")
@@ -54,8 +54,10 @@ class telnetClientThread(threading.Thread):
                                     self.conn.send(path + ";" + "bash: cd: " + cmd[3:] + ": No such file or directory")
                             else:
                                 self.conn.send(path + ";" + "bash: cd: " + cmd[3:] + ": No such file or directory")
+                if cmd == "pwd":
+                    self.conn.send(path + ";" + path)
                 else:
-                    proc = Popen("(" + path + " && " + cmd + ")", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                    proc = Popen("(cd " + path + " && " + cmd + ")", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                     cmdout = path + ";" + proc.stdout.read()
                     self.conn.send(cmdout)
             except socket.timeout:
