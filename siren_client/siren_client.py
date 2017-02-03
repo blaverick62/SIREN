@@ -44,6 +44,7 @@ class telnetClientThread(threading.Thread):
                     elif cmdlist[1] == ".":
                         self.conn.send(path + ";")
                     else:
+                        cmdlist[1] = cmdlist[1].replace("admin", "srodgers")
                         if cmdlist[1][0] == '/':
                             if os.path.isdir(cmdlist[1]):
                                 if "siren" not in cmdlist[1]:

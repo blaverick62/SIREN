@@ -225,7 +225,9 @@ class ssh_thread(threading.Thread):
                     if resplist[1] != '':
                         chanresponse = '\r\n'.join(resplist[1].split('\r\n'))
                         chanresponse = chanresponse.replace("srodgers", sshServer.username)
-                        self.chan.send(chanresponse + '\r\n')
+                        if chanresponse[-2:] != "\r\n":
+                            chanresponse = chanresponse + '\r\n'
+                        self.chan.send(chanresponse)
 
         except Exception as e:
             print('SSH Caught exception: ' + str(e.__class__) + ': ' + str(e))
