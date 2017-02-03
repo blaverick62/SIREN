@@ -114,13 +114,14 @@ class SSHInterface(paramiko.ServerInterface):
 
 class ssh_thread(threading.Thread):
 
-    def __init__(self, (client, addr), linaddr, pubkey):
+    def __init__(self, (client, addr), linaddr, pubkey, iface):
         threading.Thread.__init__(self)
         self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.logsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client = client
         self.addr = addr
         self.pubkey = pubkey
+        self.iface = iface
         # winconn = self.winsock.connect((winaddr, 23))
         try:
             self.logsock.connect(('127.0.0.1', 1338))
@@ -153,7 +154,7 @@ class ssh_thread(threading.Thread):
                 print('SSH negotiation failed.')
                 sys.exit(1)
 
-            self.destip = ni.ifaddresses('ens33')[2][0]['addr']
+            self.destip = ni.ifaddresses(self.iface)[2][0]['addr']
             ip = t.getpeername()[0]
             remoteport = self.addr[1]
             self.endtime = self.starttime
@@ -236,9 +237,10 @@ class ssh_thread(threading.Thread):
 
 class ssh_ctrl(threading.Thread):
 
-    def __init__(self, pubkey):
+    def __init__(self, pubkey, iface):
         threading.Thread.__init__(self)
         self.pubkey = pubkey
+        self.iface = iface
         detaddrs = open("siren.config", mode="r")
         addrs = detaddrs.read()
         spaddrs = addrs.split('\n')
@@ -252,7 +254,7 @@ class ssh_ctrl(threading.Thread):
             print("SSH bind failed " + str(e))
             traceback.print_exc()
             sys.exit(1)
-        print("SSH server at " + ni.ifaddresses('ens33')[2][0]['addr'])
+        print("SSH server at " + ni.ifaddresses(self.iface)[2][0]['addr'])
 
 
     def run(self):
@@ -262,7 +264,7 @@ class ssh_ctrl(threading.Thread):
                 try:
                     self.sock.listen(50)
                     newconn = self.sock.accept()
-                    th = ssh_thread(newconn, self.linaddr, self.pubkey)
+                    th = ssh_thread(newconn, self.linaddr, self.pubkey, self.iface)
                     self.threads.append(th)
                     th.start()
 

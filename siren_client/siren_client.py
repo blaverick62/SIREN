@@ -1,10 +1,10 @@
 #############################################################
 # NAME: C1C Braden J Laverick                               #
 # PROJECT: SIREN Project                                    #
-# FILE: SIREN Server Classes - telnet_server.py             #
+# FILE: SIREN Server Classes - siren_client.py              #
 # DESCRIPTION:                                              #
-# This file specifies the classes for the various control   #
-# servers that SIREN implements.                            #
+# This file receives commands and determines emulation on   #
+# the detonation chamber                                    #
 #############################################################
 
 import socket, threading, os, sys

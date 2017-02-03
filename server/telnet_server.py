@@ -8,19 +8,18 @@
 #############################################################
 
 import socket, threading, datetime, sys
+import netifaces as ni
 
 
 class telnetServerThread(threading.Thread):
 
-    def __init__(self,(conn,addr), linaddr, winaddr, det):
+    def __init__(self,(conn,addr), linaddr, winaddr, iface):
         self.conn=conn
         self.addr=addr
-        self.det=det
+        self.iface = iface
         threading.Thread.__init__(self)
-        #self.winsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.logsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # winconn = self.winsock.connect((winaddr, 23))
         try:
             self.logsock.connect(('127.0.0.1', 1337))
         except socket.error:
@@ -37,7 +36,7 @@ class telnetServerThread(threading.Thread):
 
         # Authorization and brute force logger
         self.starttime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        self.destip = socket.gethostbyname(socket.gethostname())
+        self.destip = ni.ifaddresses(self.iface)[2][0]['addr']
         ip = self.addr[0]
         remoteport = self.addr[1]
         self.endtime = self.starttime
@@ -102,56 +101,17 @@ class telnetServerThread(threading.Thread):
                 else:
                     self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, data))
                 print(data)
-                # self.winconn.sendall(data)
 
 
-                if data[:2] == 'cd':
-                    self.linsock.sendall(data)
-
-
-                elif data[:3] == 'pwd' and self.det == 'l':
-                    self.linsock.sendall(data)
-                    try:
-                        response = self.linsock.recv(20000)
-                    except socket.timeout:
-                        print("Connection with detonation chamber has timed out")
-                        self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                        self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
-                        return
-                    self.conn.send(response)
-
-
-                elif data[:2] == 'ls' and self.det == 'l':
-                    self.linsock.sendall(data)
-                    try:
-                        response = self.linsock.recv(20000)
-                    except socket.timeout:
-                        print("Connection with detonation chamber has timed out")
-                        self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                        self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
-                        self.linsock.close()
-                        return
-                    self.conn.send(response)
-
-
-                elif data[:5] == 'touch' and self.det == 'l':
-                    self.linsock.sendall(data)
-
-
-                elif data[:4] == 'echo':
-                    self.linsock.sendall(data)
-                    try:
-                        response = self.linsock.recv(20000)
-                    except socket.timeout:
-                        print("Connection with detonation chamber has timed out")
-                        self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                        self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
-                        return
-                    self.conn.send(response)
-
-
-                else:
-                    self.linsock.sendall("echo 'command not found'")
+                self.linsock.sendall(data)
+                try:
+                    response = self.linsock.recv(20000)
+                except socket.timeout:
+                    print("Connection with detonation chamber has timed out")
+                    self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
+                    return
+                self.conn.send(response)
 
 
     def stop(self):
@@ -170,12 +130,12 @@ class telnet_ctrl(threading.Thread):
     """
         Control server for the telnet Protocol server
     """
-    def __init__(self, det):
+    def __init__(self, iface):
         self.port = 23
         self.buff = 4096
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.settimeout(30)
-        self.det = det
+        self.iface = iface
         detaddrs = open("siren.config", mode="r")
         addrs = detaddrs.read()
         spaddrs = addrs.split('\n')
@@ -185,7 +145,7 @@ class telnet_ctrl(threading.Thread):
         print("Detonation chamber at %s..." % self.linaddr)
         detaddrs.close()
         try:
-            print("Starting Telnet Server at %s..." % socket.gethostbyname(socket.gethostname()))
+            print("Starting Telnet Server at %s..." % ni.ifaddresses(self.iface)[2][0]['addr'])
             self.sock.bind(('', self.port))
         except Exception as e:
             print("Telnet Server failed to bind to port...")
@@ -201,7 +161,7 @@ class telnet_ctrl(threading.Thread):
                 try:
                     newconn = self.sock.accept()
                     print(newconn[1][0])
-                    th = telnetServerThread(newconn, self.linaddr, self.winaddr, self.det)
+                    th = telnetServerThread(newconn, self.linaddr, self.winaddr, self.iface)
                     th.start()
                     self.threads.append(th)
                 except (socket.timeout, socket.gaierror) as e:

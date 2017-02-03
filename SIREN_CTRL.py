@@ -32,6 +32,8 @@ def main():
     with open('sirenpublic.key', mode='r') as content_file:
         pubkey = content_file.readline()
 
+    iface = str(raw_input("What interface would you like to listen on? >> "))
+
     config = open("siren.config", mode='w')
     linaddr = '256.256.256.256'
     while ipCheck(linaddr) == 0:
@@ -55,20 +57,20 @@ def main():
     siren_log.start()
     sleep(10)
 
-    ssh_thread = ssh_ctrl(pubkey)
+    ssh_thread = ssh_ctrl(pubkey, iface)
     ssh_thread.setDaemon(True)
 
-    #telnet_thread = telnet_ctrl('l')
-
-    #telnet_thread.setDaemon(True)
+    telnet_thread = telnet_ctrl(iface)
+    telnet_thread.setDaemon(True)
 
 
 
     try:
         ssh_thread.start()
-        #telnet_thread.start()
+        telnet_thread.start()
     except KeyboardInterrupt:
-        #telnet_thread.stop()
+        ssh_thread.stop()
+        telnet_thread.stop()
         sys.exit()
 
     try:
@@ -76,15 +78,17 @@ def main():
             try:
                 line = sys.stdin.read()
                 if line == "exit":
-                    #telnet_thread.stop()
-                    sys.exit()
+                    ssh_thread.stop()
+                    telnet_thread.stop()
+                    sys.exit(0)
             except Exception:
-                #telnet_thread.stop()
-                break
+                ssh_thread.stop()
+                telnet_thread.stop()
+                sys.exit(0)
     except KeyboardInterrupt:
         print("Keyboard interrupt caught in main")
-        #ssh_thread.stop()
-        #siren_log.stop()
+        ssh_thread.stop()
+        siren_log.stop()
         sys.exit(0)
 
 
