@@ -66,6 +66,9 @@ class telnetClientThread(threading.Thread):
                 else:
                     proc = Popen("(cd " + path + " && " + cmd + ")", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                     cmdout = path + ";" + proc.stdout.read()
+                    cmdout = cmdout.replace("siren", "")
+                    cmdout = cmdout.replace("\nsiren", "")
+                    cmdout = cmdout.replace("siren\n", "")
                     self.conn.send(cmdout)
             except socket.timeout:
                 print("SIREN connection has timed out")

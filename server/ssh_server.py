@@ -224,6 +224,8 @@ class ssh_thread(threading.Thread):
                     path = path.replace("srodgers", sshServer.username)
                     if resplist[1] != '':
                         chanresponse = '\r\n'.join(resplist[1].split('\n'))
+                        chanresponse = chanresponse.replace("\nsrodgers", '\n' + sshServer.username)
+                        chanresponse = chanresponse.replace("srodgers\n", sshServer.username + '\n')
                         chanresponse = chanresponse.replace("srodgers", sshServer.username)
                         if chanresponse[-2:] != "\r\n":
                             chanresponse = chanresponse + '\r\n'
