@@ -90,8 +90,11 @@ class telnetServerThread(threading.Thread):
                 print("Connection closed for unknown reason by attacker")
                 self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
+                self.linsock.send("TERMINATE")
+                self.logsock.send("TERMINATE")
                 self.linsock.close()
-                return
+                self.logsock.close()
+                sys.exit(0)
 
 
             timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -114,13 +117,16 @@ class telnetServerThread(threading.Thread):
                     print("Connection with detonation chamber has timed out")
                     self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
-                    return
+                    self.logsock.send("TERMINATE")
+                    self.logsock.close()
+                    sys.exit(0)
                 if len(resplist) > 1:
                     self.conn.send(resplist[1])
 
 
     def stop(self):
         self.linsock.send("TERMINATE")
+        self.logsock.send("TERMINATE")
         self.linsock.close()
         self.logsock.close()
 
