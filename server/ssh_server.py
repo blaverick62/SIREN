@@ -180,7 +180,7 @@ class ssh_thread(threading.Thread):
             response = self.linsock.recv(256)
             resplist = response.split(";")
             path = resplist[0]
-            path.replace("srodgers", sshServer.username)
+            path = path.replace("srodgers", sshServer.username)
             self.chan.send(path + '\r\n')
             while True:
                 path.replace("/home/admin", "~")
@@ -221,10 +221,10 @@ class ssh_thread(threading.Thread):
                     sys.exit(1)
                 resplist = response.split(";")
                 path = resplist[0]
-                path.replace("srodgers", sshServer.username)
+                path = path.replace("srodgers", sshServer.username)
                 if len(resplist) > 1:
                     chanresponse = '\r\n'.join(resplist[1].split('\r\n'))
-                    chanresponse.replace("srodgers", sshServer.username)
+                    chanresponse = chanresponse.replace("srodgers", sshServer.username)
                     self.chan.send(chanresponse + '\r\n')
 
         except Exception as e:

@@ -48,7 +48,6 @@ class logger_store(threading.Thread):
                             f.write("{}: {} entered command: {}\n".format(args[2], args[1], args[3]))
                         self.cursor.execute("select session_id from SESSION where starttime='{}';".format(args[1]))
                         id = self.cursor.fetchone()[0]
-                        print(id)
                         row = self.cursor.fetchone()
                         while row is not None:
                             row = self.cursor.fetchone()
@@ -56,7 +55,6 @@ class logger_store(threading.Thread):
                     if args[0] == "AUTH":
                         self.cursor.execute("select session_id from SESSION where starttime='{}';".format(args[1]))
                         id = self.cursor.fetchone()[0]
-                        print(id)
                         row = self.cursor.fetchone()
                         while row is not None:
                             row = self.cursor.fetchone()

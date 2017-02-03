@@ -30,8 +30,11 @@ class telnetClientThread(threading.Thread):
                 if cmd[:2] == "cd":
                     if cmd[3:] == "..":
                         pathlist = path.split("/")
-                        pathlist = pathlist[-1]
-                        path = "/".join(pathlist)
+                        if len(pathlist) > 1:
+                            pathlist = pathlist[:-1]
+                        if len(pathlist) > 1:
+                            path = "/".join(pathlist)
+                        path ="/" + path
                         self.conn.send(path + ";")
                     elif cmd[3:] == ".":
                         self.conn.send(path + ";")
