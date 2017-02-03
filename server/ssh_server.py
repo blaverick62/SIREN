@@ -212,20 +212,20 @@ class ssh_thread(threading.Thread):
                         threatlog.write(ip + ": " + data + '\n')
                 else:
                     self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, data))
-                self.linsock.sendall(data)
-                try:
-                    response = self.linsock.recv(2048)
-                except socket.timeout as e:
-                    print("Detonation chamber timed out: " + str(e))
-                    traceback.print_exc()
-                    sys.exit(1)
-                resplist = response.split(";")
-                path = resplist[0]
-                path = path.replace("srodgers", sshServer.username)
-                if len(resplist) > 1:
-                    chanresponse = '\r\n'.join(resplist[1].split('\r\n'))
-                    chanresponse = chanresponse.replace("srodgers", sshServer.username)
-                    self.chan.send(chanresponse + '\r\n')
+                    self.linsock.sendall(data)
+                    try:
+                        response = self.linsock.recv(2048)
+                    except socket.timeout as e:
+                        print("Detonation chamber timed out: " + str(e))
+                        traceback.print_exc()
+                        sys.exit(1)
+                    resplist = response.split(";")
+                    path = resplist[0]
+                    path = path.replace("srodgers", sshServer.username)
+                    if resplist[1] != '':
+                        chanresponse = '\r\n'.join(resplist[1].split('\r\n'))
+                        chanresponse = chanresponse.replace("srodgers", sshServer.username)
+                        self.chan.send(chanresponse + '\r\n')
 
         except Exception as e:
             print('SSH Caught exception: ' + str(e.__class__) + ': ' + str(e))
