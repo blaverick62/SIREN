@@ -53,15 +53,15 @@ def main():
             print("Invalid IP address. Please try again.")
 
     siren_log = logger(dbAddr, 'sirenlocal', 'sirenproj')
-    siren_log.setDaemon(True)
+    #siren_log.setDaemon(True)
     siren_log.start()
     sleep(10)
 
     ssh_thread = ssh_ctrl(pubkey, iface)
-    ssh_thread.setDaemon(True)
+    #ssh_thread.setDaemon(True)
 
     telnet_thread = telnet_ctrl(iface)
-    telnet_thread.setDaemon(True)
+    #telnet_thread.setDaemon(True)
 
 
 
@@ -80,14 +80,17 @@ def main():
                 if line == "exit":
                     ssh_thread.stop()
                     telnet_thread.stop()
+                    siren_log.stop()
                     sys.exit(0)
             except Exception:
                 ssh_thread.stop()
                 telnet_thread.stop()
+                siren_log.stop()
                 sys.exit(0)
     except KeyboardInterrupt:
         print("Keyboard interrupt caught in main")
         ssh_thread.stop()
+        telnet_thread.stop()
         siren_log.stop()
         sys.exit(0)
 

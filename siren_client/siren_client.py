@@ -63,7 +63,7 @@ class telnetClientThread(threading.Thread):
                                     self.conn.send(path + ";" + "bash: cd: " + cmdlist[1] + ": No such file or directory")
                             else:
                                 self.conn.send(path + ";" + "bash: cd: " + cmdlist[1] + ": No such file or directory")
-                elif cmdlist[0] == "cat" and cmdlist[1] == "/etc/passwd":
+                elif cmdlist[0] == "cat" and (cmdlist[1] == "/etc/passwd" or cmdlist[1] == "passwd" or cmdlist[1] == "/etc/passwd-" or cmdlist[1] == "passwd-"):
                     with open('sirenpass.txt', mode='r') as f:
                         falsepass = f.read()
                     self.conn.send(path + ";" + falsepass)
