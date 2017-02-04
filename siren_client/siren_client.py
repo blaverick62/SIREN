@@ -77,9 +77,11 @@ class telnetClientThread(threading.Thread):
                     cmdout = active + passive
                     self.conn.send(path + ";" + cmdout)
                 elif cmdlist[0] == "ping":
+                    print("ping caught")
                     with open('pingerr.txt', mode='r') as f:
                         pingerr = f.read()
                     if cmdlist[1] == "-c":
+                        print("count argument")
                         try:
                             errflg = 0
                             try:
@@ -107,8 +109,10 @@ class telnetClientThread(threading.Thread):
                             self.conn.send(path + ";" + pingerr)
                             continue
                     elif cmdlist[1][0] == "-":
+                        print("other argument")
                         self.conn.send(path + ";" + pingerr)
                     else:
+                        print("no argument")
                         try:
                             pingresp = os.system("ping -c 1 " + cmdlist[1])
                         except IndexError:

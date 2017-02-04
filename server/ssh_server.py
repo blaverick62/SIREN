@@ -214,6 +214,8 @@ class ssh_thread(threading.Thread):
                     self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, data))
                     if data.split()[0] == "netstat":
                         self.linsock.sendall("netstat " + ip)
+                    else:
+                        self.linsock.sendall(data)
                     try:
                         response = self.linsock.recv(2048)
                     except socket.timeout as e:
