@@ -1,0 +1,23 @@
+Active Internet connections (w/o servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+Active UNIX domain sockets (w/o servers)
+Proto RefCnt Flags       Type       State         I-Node   Path
+unix  6      [ ]         DGRAM                    11382    /dev/log
+unix  3      [ ]         STREAM     CONNECTED     11277    
+unix  2      [ ]         DGRAM                    11524    
+unix  3      [ ]         STREAM     CONNECTED     11232    
+unix  2      [ ]         DGRAM                    12177    
+unix  3      [ ]         STREAM     CONNECTED     9952     @/com/ubuntu/upstart
+unix  3      [ ]         STREAM     CONNECTED     11036    @/com/ubuntu/upstart
+unix  3      [ ]         STREAM     CONNECTED     11595    /var/run/dbus/system_bus_socket
+unix  3      [ ]         DGRAM                    9969     
+unix  2      [ ]         DGRAM                    11578    
+unix  3      [ ]         STREAM     CONNECTED     11373    
+unix  3      [ ]         STREAM     CONNECTED     9944     
+unix  3      [ ]         STREAM     CONNECTED     11374    /var/run/dbus/system_bus_socket
+unix  2      [ ]         DGRAM                    12086    
+unix  3      [ ]         STREAM     CONNECTED     11259    @/com/ubuntu/upstart
+unix  3      [ ]         STREAM     CONNECTED     11032    
+unix  3      [ ]         DGRAM                    9970     
+unix  3      [ ]         STREAM     CONNECTED     11278    
+unix  3      [ ]         STREAM     CONNECTED     11594    
