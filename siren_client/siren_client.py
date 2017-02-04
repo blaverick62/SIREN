@@ -7,8 +7,9 @@
 # the detonation chamber                                    #
 #############################################################
 
-import socket, threading, os, sys
+import socket, threading, os, sys, random
 from subprocess import Popen, PIPE, STDOUT
+from time import sleep
 
 class telnetClientThread(threading.Thread):
     def __init__(self,(conn,addr)):
@@ -75,7 +76,54 @@ class telnetClientThread(threading.Thread):
                         passive = f.read()
                     cmdout = active + passive
                     self.conn.send(path + ";" + cmdout)
-
+                elif cmdlist[0] == "ping":
+                    with open('pingerr.txt', mode='r') as f:
+                        pingerr = f.read()
+                    if cmdlist[1] == "-c":
+                        try:
+                            errflg = 0
+                            try:
+                                int(cmdlist[2])
+                            except ValueError:
+                                errflg = 1
+                            if errflg == 0:
+                                try:
+                                    pingresp = os.system("ping -c 1 " + cmdlist[3])
+                                except IndexError:
+                                    self.conn.send(path + ";" + pingerr)
+                                    continue
+                                if pingresp == 0:
+                                    cmdout = "PING "+ cmdlist[3] + "56(84) bytes of data."
+                                    for i in range(1, int(cmdlist[2]) + 1):
+                                        pingtime = random.random() * 30 + 40
+                                        cmdout = cmdout + "\n64 bytes from " + cmdlist[3] + ": icmp_seq=1 ttl=128 time=" + str(pingtime) + " ms"
+                                    self.conn.send(path + ";" + cmdout)
+                                else:
+                                    sleep(15)
+                                    self.conn.send(path + ";" + "ping: unknown host " + cmdlist[3])
+                            else:
+                                self.conn.send(path + ";" + pingerr)
+                        except IndexError:
+                            self.conn.send(path + ";" + pingerr)
+                            continue
+                    elif cmdlist[1][0] == "-":
+                        self.conn.send(path + ";" + pingerr)
+                    else:
+                        try:
+                            pingresp = os.system("ping -c 1 " + cmdlist[1])
+                        except IndexError:
+                            self.conn.send(path + ";" + pingerr)
+                            continue
+                        if pingresp == 0:
+                            cmdout = "PING " + cmdlist[1] + "56(84) bytes of data."
+                            for i in range(1, 5):
+                                pingtime = random.random() * 30 + 40
+                                cmdout = cmdout + "\n64 bytes from " + cmdlist[1] + ": icmp_seq=1 ttl=128 time=" + str(
+                                    pingtime) + " ms"
+                            self.conn.send(path + ";" + cmdout)
+                        else:
+                            sleep(15)
+                            self.conn.send(path + ";" + "ping: unknown host " + cmdlist[1])
                 else:
                     proc = Popen("(cd " + path + " && " + cmd + ")", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                     cmdout = path + ";" + proc.stdout.read()
