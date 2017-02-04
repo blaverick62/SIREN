@@ -63,6 +63,10 @@ class telnetClientThread(threading.Thread):
                                     self.conn.send(path + ";" + "bash: cd: " + cmdlist[1] + ": No such file or directory")
                             else:
                                 self.conn.send(path + ";" + "bash: cd: " + cmdlist[1] + ": No such file or directory")
+                elif cmdlist[0] == "cat" and cmdlist[1] == "/etc/passwd":
+                    with open('sirenpass.txt', mode='r') as f:
+                        falsepass = f.read()
+                    self.conn.send(path + ";" + falsepass)
                 else:
                     proc = Popen("(cd " + path + " && " + cmd + ")", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                     cmdout = path + ";" + proc.stdout.read()
@@ -73,7 +77,8 @@ class telnetClientThread(threading.Thread):
             except socket.timeout:
                 print("SIREN connection has timed out")
                 return
-
+            except KeyboardInterrupt:
+                sys.exit(0)
 
     def stop(self):
         self.conn.close()
@@ -94,5 +99,5 @@ while 1:
     except KeyboardInterrupt:
         for i in threads:
             i.stop()
-        sys.exit()
+        sys.exit(0)
 
