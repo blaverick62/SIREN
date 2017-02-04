@@ -61,6 +61,7 @@ class telnetServerThread(threading.Thread):
                 for line in users:
                     auth = line.split(':')
                     if(username == auth[0] and password == auth[1]):
+                        self.username = username
                         success = 1
             self.logsock.send("AUTH;{};{};{};{};{}".format(self.starttime, success, username, password,
                                                            datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
@@ -73,9 +74,9 @@ class telnetServerThread(threading.Thread):
         self.linsock.send("pwd")
         try:
             resp = self.linsock.recv(256)
-            self.conn.send(resp)
+            self.conn.send(resp.split(";")[1].replace("srodgers", self.username))
         except socket.timeout as e:
-            print("Detonation chamber timed out: " + e)
+            print("Detonation chamber timed out: " + str(e))
             traceback.print_exc()
             sys.exit(1)
 
@@ -113,6 +114,10 @@ class telnetServerThread(threading.Thread):
                 try:
                     response = self.linsock.recv(20000)
                     resplist = response.split(";")
+                    chanresponse = '\r\n'.join(resplist[1].split('\n'))
+                    chanresponse = chanresponse.replace("\nsrodgers", '\n' + self.username)
+                    chanresponse = chanresponse.replace("srodgers\n", self.username + '\n')
+                    chanresponse = chanresponse.replace("srodgers", )
                 except socket.timeout:
                     print("Connection with detonation chamber has timed out")
                     self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')

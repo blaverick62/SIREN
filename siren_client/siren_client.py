@@ -67,6 +67,15 @@ class telnetClientThread(threading.Thread):
                     with open('sirenpass.txt', mode='r') as f:
                         falsepass = f.read()
                     self.conn.send(path + ";" + falsepass)
+                elif cmdlist[0] == "sudo":
+                    self.conn.send(path + ";" + "lol yeah nah m8 ill fuckin nip ya")
+                elif cmdlist[0] == "netstat":
+                    active = "Active Internet connections (w/o servers)\nProto\tRecv-Q\tSend-Q\tLocal Address\t\tForeign Address\t\tState\ntcp\t0\t0\t"+self.addr[0]+":23\t"+cmdlist[1]+":telnet\tESTABLISHED\n"
+                    with open('netout.txt', mode='r') as f:
+                        passive = f.read()
+                    cmdout = active + passive
+                    self.conn.send(path + ";" + cmdout)
+
                 else:
                     proc = Popen("(cd " + path + " && " + cmd + ")", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                     cmdout = path + ";" + proc.stdout.read()
