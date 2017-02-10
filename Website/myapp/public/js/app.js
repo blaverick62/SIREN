@@ -33,16 +33,16 @@ $(document).ready(function(){
             // Get Geolocation Data
             //***************************************************
 
-            var atlassock = new WebSocket("atlas.dlinkddns.com");
+            var atlassock = new WebSocket('http//atlas.dlinkddns.com:80/');
 
             var geodata = [];
             atlassock.onmessage = function(event){
                 geodata.push(event.data);
-                console.log(event.data)
+                console.log(event.data);
             }
 
             for(i = 0; i < ips.length; i++){
-                atlassock.send(ips[i])
+                atlassock.send(ips[i]);
             }
 
             //***************************************************
