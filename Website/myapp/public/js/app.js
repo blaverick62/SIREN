@@ -28,6 +28,23 @@ $(document).ready(function(){
             var localports = JSON.parse(data[12]);
             var remoteports = JSON.parse(data[13]);
 
+
+            //***************************************************
+            // Get Geolocation Data
+            //***************************************************
+
+            var atlassock = new WebSocket("atlas.dlinkddns.com");
+
+            var geodata = [];
+            atlassock.onmessage = function(event){
+                geodata.push(event.data);
+                console.log(event.data)
+            }
+
+            for(i = 0; i < ips.length; i++){
+                atlassock.send(ips[i])
+            }
+
             //***************************************************
             //  IP Address Frequency Chart
             //***************************************************

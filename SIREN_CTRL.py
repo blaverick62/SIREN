@@ -19,6 +19,7 @@ from Crypto.PublicKey import RSA
 
 import sys
 
+# Check validity of IP addresses
 def ipCheck(ip):
     iparr = ip.split('.')
     if len(iparr) != 4:
@@ -29,10 +30,12 @@ def ipCheck(ip):
     return 1
 
 def main():
+    # Read in public key
     with open('sirenpublic.key', mode='r') as content_file:
         pubkey = content_file.readline()
 
     iface = str(raw_input("What interface would you like to listen on? >> "))
+
 
     config = open("siren.config", mode='w')
     linaddr = '256.256.256.256'
@@ -40,12 +43,13 @@ def main():
         linaddr = str(raw_input("What is the IP address of the Linux Detonation Chamber? >> "))
         if ipCheck(linaddr) == 0:
             print("Invalid IP address. Please try again.")
+    # Write IP addresses
     config.write(linaddr + '\n')
-    #winaddr = str(raw_input("What is the IP address of the Windows Detonation Chamber? >> "))
     winaddr = '0.0.0.0'
     config.write(winaddr + '\n')
     config.close()
 
+    # Get address of external DB server
     dbAddr = '256.256.256.256'
     while ipCheck(dbAddr) == 0:
         dbAddr = str(raw_input("What is the IP address of the database? >> "))
@@ -64,7 +68,7 @@ def main():
     #telnet_thread.setDaemon(True)
 
 
-
+    # Start server threads\
     try:
         ssh_thread.start()
         telnet_thread.start()
@@ -74,6 +78,7 @@ def main():
         sys.exit()
 
     try:
+        # Stdin catch doesn't work
         while 1:
             try:
                 line = sys.stdin.read()
@@ -87,6 +92,7 @@ def main():
                 telnet_thread.stop()
                 siren_log.stop()
                 sys.exit(0)
+    # Catches interrupt, doesn't do anything
     except KeyboardInterrupt:
         print("Keyboard interrupt caught in main")
         ssh_thread.stop()

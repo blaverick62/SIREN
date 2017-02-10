@@ -1,0 +1,29 @@
+Welcome to Ubuntu 14.04.5 LTS (GNU/Linux 4.2.0-27-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+
+  System information as of Thu Feb  9 11:24:24 MST 2017
+
+  System load: 0.15              Memory usage: 11%   Processes:       209
+  Usage of /:  4.6% of 38.02GB   Swap usage:   0%    Users logged in: 0
+
+  Graph this data and manage this system at:
+    https://landscape.canonical.com/
+
+
+WARNING: Security updates for your current Hardware Enablement Stack
+ended on 2016-08-04:
+ * http://wiki.ubuntu.com/1404_HWE_EOL
+
+To upgrade to a supported (or longer-supported) configuration:
+
+* Upgrade from Ubuntu 14.04 LTS to Ubuntu 16.04 LTS by running:
+sudo do-release-upgrade
+
+OR
+
+* Switch to the current security-supported stack by running:
+sudo apt-get install linux-generic-lts-xenial linux-image-generic-lts-xenial
+
+and reboot your system.
+Last login: Fri Feb  3 20:24:19 2017

@@ -26,14 +26,17 @@ from paramiko.py3compat import u
 
 
 class SSHInterface(paramiko.ServerInterface):
+# Class that overrides some paramiko methods for the server
+# provides tools to the control and handler threads for SSH
+# Intricacies of SSH are handled here
 
     def __init__(self, pubkey, starttime):
-
         self.hostkey = paramiko.RSAKey(filename='sirenprivate.key')
         self.pubkey = paramiko.RSAKey(data=base64.b64decode(pubkey[7:]))
         self.event = threading.Event()
         self.starttime = starttime
         try:
+            # Logging socket needed to catch authorization
             self.logsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.logsock.connect(('127.0.0.1', 1338))
         except Exception as e:
@@ -42,6 +45,7 @@ class SSHInterface(paramiko.ServerInterface):
             sys.exit(1)
 
     def check_channel_request(self, kind, chanid):
+        # Open a Paramiko channel
         if kind == 'session':
             return paramiko.OPEN_SUCCEEDED
         return paramiko.OPEN_FAILED_ADMINISTRATIVELY_PROHIBITED
@@ -49,6 +53,7 @@ class SSHInterface(paramiko.ServerInterface):
 
 
     def check_auth_password(self, username, password):
+        # Override authorization with password to include logging
         with open('server/users.txt', mode='r') as users:
             for line in users:
                 auth = line.split(':')
@@ -63,6 +68,7 @@ class SSHInterface(paramiko.ServerInterface):
             return paramiko.AUTH_FAILED
 
     def check_auth_publickey(self, username, key):
+        # Log username and public keys used
         print('Auth attempt with key: ' + u(hexlify(key.get_fingerprint())))
         with open('server.users.txt', mode='r') as users:
             for line in users:
@@ -79,6 +85,7 @@ class SSHInterface(paramiko.ServerInterface):
     def check_auth_gssapi_with_mic(self, username,
                                    gss_authenticated= paramiko.AUTH_FAILED,
                                    cc_file=None):
+        # Use GSS API
         if gss_authenticated == paramiko.AUTH_SUCCESSFUL:
             return paramiko.AUTH_SUCCESSFUL
         return paramiko.AUTH_FAILED
@@ -86,6 +93,7 @@ class SSHInterface(paramiko.ServerInterface):
     def check_auth_gssapi_keyex(self, username,
                                 gss_authenticated=paramiko.AUTH_FAILED,
                                 cc_file=None):
+        # Use GSS API
         if gss_authenticated == paramiko.AUTH_SUCCESSFUL:
             return paramiko.AUTH_SUCCESSFUL
         return paramiko.AUTH_FAILED
@@ -96,24 +104,31 @@ class SSHInterface(paramiko.ServerInterface):
         return UseGSSAPI
 
     def get_allowed_auths(self, username):
+        # Define allowed authorizations
         return 'gssapi-keyex,gssapi-with-mic,password,publickey'
 
     def check_channel_shell_request(self, channel):
+        # Tell the client that they have been given shell
         self.event.set()
         print("SHELL REQUESTED")
         return True
 
     def check_channel_pty_request(self, channel, term, width, height, pixelwidth, pixelheight,
                                   modes):
+        # Give client a pseudo-terminal on request
         return True
 
     def check_channel_exec_request(self, channel, command):
         print(command)
+        # Allow client to execute single commands, print them
         self.event.set()
         return True
 
 
 class ssh_thread(threading.Thread):
+# Handler thread class for SSH server
+# Spawned on connection from client
+# Spawns SSH Interface object
 
     def __init__(self, (client, addr), linaddr, pubkey, iface):
         threading.Thread.__init__(self)
@@ -137,10 +152,15 @@ class ssh_thread(threading.Thread):
             sys.exit(1)
 
     def run(self):
+        # Allow GSS API and log start time of session
         DoGSSAPIKeyExchange = True
         self.starttime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # Construct SSH server interface with respective key and start time
+        # Start time needed to connect auths to appropriate session
         sshServer = SSHInterface(self.pubkey, self.starttime)
         try:
+            # Instantiate paramiko transport layer
             t = paramiko.Transport(self.client, gss_kex=DoGSSAPIKeyExchange)
             t.set_gss_host(socket.getfqdn(""))
             try:
@@ -148,6 +168,7 @@ class ssh_thread(threading.Thread):
             except:
                 print("Failed to load moduli: gex will be unsupported")
                 raise
+            # Add key to known hosts
             t.add_server_key(sshServer.hostkey)
             try:
                 t.start_server(server=sshServer)
@@ -155,14 +176,19 @@ class ssh_thread(threading.Thread):
                 print('SSH negotiation failed.')
                 sys.exit(1)
 
+            # Get local ip with netifaces module and specified listening interface
             self.destip = ni.ifaddresses(self.iface)[2][0]['addr']
+            # Get remote ip from transport layer
             ip = t.getpeername()[0]
             remoteport = self.addr[1]
             self.endtime = self.starttime
+            # Now that all components are accounted for, log session
             self.logsock.send(
                 "SESSION;{};{};{};{};{};{};{}".format(self.starttime, self.endtime, ip, self.destip, 'ssh', 22,
                                                       remoteport))
             print(ip)
+            # Accept connection and open channel
+            # Channel is analogous to paramiko socket
             self.chan = t.accept()
 
             if self.chan is None:
@@ -174,20 +200,29 @@ class ssh_thread(threading.Thread):
                 print('*** Client never asked for a shell.')
                 sys.exit(1)
 
-
-            self.chan.send('\r\n\r\nWelcome to Ubuntu 16.04\r\n\r\n')
+            # Send false welcome message and working directory
+            with open('intro.txt', mode='r') as f:
+                intro = f.read()
+            self.chan.send(intro)
             self.linsock.send('pwd')
             response = self.linsock.recv(256)
             resplist = response.split(";")
             path = resplist[0]
+            # Sanitize response from chamber to replace chamber username with SIREN username
             path = path.replace("srodgers", sshServer.username)
-            self.chan.send(path + '\r\n')
             while True:
-                path = path.replace("/home/admin", "~")
+                # Replace home directory with ~
+                path = path.replace("/home/" + sshServer.username, "~")
+                # Send real-looking SSH prompt
                 self.chan.send(sshServer.username + '@ubuntu:' + path + '$ ')
                 data = ""
+
+                # Wait for receive ready flag
+                # Flag pops when at least one byte is ready for receive
+                # Usually receive one byte at a time
                 while self.chan.recv_ready() == False:
                     pass
+                # Build input string until enter character is found
                 while '\r' not in data:
                     rec = self.chan.recv(256)
                     if rec == '\b':
@@ -196,8 +231,10 @@ class ssh_thread(threading.Thread):
                         data = data + rec
                     self.chan.send(rec)
                 self.chan.send('\n')
+                # Cut off carriage return character
                 data = data[:-1]
                 if data == "exit":
+                    # End sockets and log end time
                     self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
                     sleep(1)
@@ -206,12 +243,17 @@ class ssh_thread(threading.Thread):
                     self.chan.close()
                     sys.exit(0)
                 timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+                # Check for evidence of SQL Injection, don't send to logger
                 if "'" in data:
                     print("SQL Injection detected! Isolating threat...")
                     with open('threatlog.txt', mode='a') as threatlog:
                         threatlog.write(ip + ": " + data + '\n')
                 else:
+                    # Log input
                     self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, data))
+                    # If sent command is netstat, send IP address as well
+                    # Send command to the detonation chamber for processing
                     if data.split()[0] == "netstat":
                         self.linsock.sendall("netstat " + ip)
                     else:
@@ -222,14 +264,18 @@ class ssh_thread(threading.Thread):
                         print("Detonation chamber timed out: " + str(e))
                         traceback.print_exc()
                         sys.exit(1)
+                    # Chamber sends back path;response, unpackage the message
                     resplist = response.split(";")
                     path = resplist[0]
+                    # Sanitize path
                     path = path.replace("srodgers", sshServer.username)
                     if resplist[1] != '':
+                        # Sanitize response
                         chanresponse = '\r\n'.join(resplist[1].split('\n'))
                         chanresponse = chanresponse.replace("\nsrodgers", '\n' + sshServer.username)
                         chanresponse = chanresponse.replace("srodgers\n", sshServer.username + '\n')
                         chanresponse = chanresponse.replace("srodgers", sshServer.username)
+                        # Add clean carriage return/newline characters
                         if chanresponse[-2:] != "\r\n":
                             chanresponse = chanresponse + '\r\n'
                         self.chan.send(chanresponse)
@@ -289,10 +335,13 @@ class ssh_ctrl(threading.Thread):
         try:
             while 1:
                 try:
+                    # Listen for connections
                     self.sock.listen(50)
                     newconn = self.sock.accept()
+                    # Spawn handler thread and start it
                     th = ssh_thread(newconn, self.linaddr, self.pubkey, self.iface)
                     th.start()
+                    # Append it to thread list
                     self.threads.append(th)
                 except Exception as e:
                     print('SSH Listen/accept failed: ' + str(e))
