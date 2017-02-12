@@ -17,7 +17,7 @@ from time import sleep
 from os import chmod
 from Crypto.PublicKey import RSA
 
-import sys
+import sys, ConfigParser
 
 # Check validity of IP addresses
 def ipCheck(ip):
@@ -34,37 +34,16 @@ def main():
     with open('sirenpublic.key', mode='r') as content_file:
         pubkey = content_file.readline()
 
-    iface = str(raw_input("What interface would you like to listen on? >> "))
-
-
-    config = open("siren.config", mode='w')
-    linaddr = '256.256.256.256'
-    while ipCheck(linaddr) == 0:
-        linaddr = str(raw_input("What is the IP address of the Linux Detonation Chamber? >> "))
-        if ipCheck(linaddr) == 0:
-            print("Invalid IP address. Please try again.")
-    # Write IP addresses
-    config.write(linaddr + '\n')
-    winaddr = '0.0.0.0'
-    config.write(winaddr + '\n')
-    config.close()
-
-    # Get address of external DB server
-    dbAddr = '256.256.256.256'
-    while ipCheck(dbAddr) == 0:
-        dbAddr = str(raw_input("What is the IP address of the database? >> "))
-        if ipCheck(dbAddr) == 0:
-            print("Invalid IP address. Please try again.")
-
-    siren_log = logger(dbAddr, 'sirenlocal', 'sirenproj')
+    # Start logger
+    siren_log = logger()
     #siren_log.setDaemon(True)
     siren_log.start()
     sleep(10)
 
-    ssh_thread = ssh_ctrl(pubkey, iface)
+    ssh_thread = ssh_ctrl(pubkey)
     #ssh_thread.setDaemon(True)
 
-    telnet_thread = telnet_ctrl(iface)
+    telnet_thread = telnet_ctrl()
     #telnet_thread.setDaemon(True)
 
 

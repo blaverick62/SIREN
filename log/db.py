@@ -7,19 +7,21 @@
 # text and MySQL logging facility                           #
 #############################################################
 
-import threading, MySQLdb, sys, json, urllib2
+import threading, MySQLdb, sys, json, urllib2, ConfigParser
 
 
 class logger_store(threading.Thread):
 
-    def __init__(self, buffer, mutex, ip, username, password):
+    def __init__(self, buffer, mutex):
         threading.Thread.__init__(self)
         self.buffer = buffer
         self.mutex = mutex
-        self.db = MySQLdb.connect(host=ip,
-                                  user=username,
-                                  passwd=password,
-                                  db="siren_db")
+        config = ConfigParser.ConfigParser()
+        config.read('siren.cfg')
+        self.db = MySQLdb.connect(host=config.get('MySQL','host'),
+                                  user=config.get('MySQL','user'),
+                                  passwd=config.get('MySQL', 'password'),
+                                  db=config.get('MySQL', 'database'))
         self.cursor = self.db.cursor()
         for line in open("log/siren_schema.sql"):
             self.cursor.execute(line)

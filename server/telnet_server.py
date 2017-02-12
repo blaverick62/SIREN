@@ -7,16 +7,17 @@
 # servers that SIREN implements.                            #
 #############################################################
 
-import socket, threading, datetime, sys, traceback
+import socket, threading, datetime, sys, traceback, ConfigParser
 import netifaces as ni
 
 
 class telnetServerThread(threading.Thread):
 
-    def __init__(self,(conn,addr), linaddr, winaddr, iface):
+    def __init__(self,(conn,addr), linaddr, winaddr, iface, detuser):
         self.conn=conn
         self.addr=addr
         self.iface = iface
+        self.detuser = detuser
         threading.Thread.__init__(self)
         self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.logsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -74,7 +75,7 @@ class telnetServerThread(threading.Thread):
         self.linsock.send("pwd")
         try:
             resp = self.linsock.recv(256)
-            self.conn.send(resp.split(";")[1].replace("srodgers", self.username))
+            self.conn.send(resp.split(";")[1].replace(self.detuser, self.username))
         except socket.timeout as e:
             print("Detonation chamber timed out: " + str(e))
             traceback.print_exc()
@@ -115,9 +116,9 @@ class telnetServerThread(threading.Thread):
                     response = self.linsock.recv(20000)
                     resplist = response.split(";")
                     chanresponse = '\r\n'.join(resplist[1].split('\n'))
-                    chanresponse = chanresponse.replace("\nsrodgers", '\n' + self.username)
-                    chanresponse = chanresponse.replace("srodgers\n", self.username + '\n')
-                    chanresponse = chanresponse.replace("srodgers", )
+                    chanresponse = chanresponse.replace('\n'+self.detuser, '\n' + self.username)
+                    chanresponse = chanresponse.replace(self.detuser+'\n', self.username + '\n')
+                    chanresponse = chanresponse.replace(self.detuser, self.username)
                 except socket.timeout:
                     print("Connection with detonation chamber has timed out")
                     self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -146,20 +147,17 @@ class telnet_ctrl(threading.Thread):
     """
         Control server for the telnet Protocol server
     """
-    def __init__(self, iface):
+    def __init__(self):
         self.port = 23
         self.buff = 4096
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.settimeout(30)
-        self.iface = iface
-        detaddrs = open("siren.config", mode="r")
-        addrs = detaddrs.read()
-        spaddrs = addrs.split('\n')
-        self.linaddr = spaddrs[0]
-        print(self.linaddr)
-        self.winaddr = spaddrs[1]
-        print("Detonation chamber at %s..." % self.linaddr)
-        detaddrs.close()
+        config = ConfigParser.ConfigParser()
+        config.read('siren.cfg')
+        self.iface = config.get('Interfaces', 'interface')
+        self.linaddr = config.get('Detonation Chamber', 'host')
+        self.winaddr = '0.0.0.0'
+        self.detuser = config.get('Detonation Chamber', 'user')
         try:
             print("Starting Telnet Server at %s..." % ni.ifaddresses(self.iface)[2][0]['addr'])
             self.sock.bind(('', self.port))
@@ -177,7 +175,7 @@ class telnet_ctrl(threading.Thread):
                 try:
                     newconn = self.sock.accept()
                     print(newconn[1][0])
-                    th = telnetServerThread(newconn, self.linaddr, self.winaddr, self.iface)
+                    th = telnetServerThread(newconn, self.linaddr, self.winaddr, self.iface, self.detuser)
                     th.start()
                     self.threads.append(th)
                 except (socket.timeout, socket.gaierror) as e:

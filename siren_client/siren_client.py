@@ -7,7 +7,7 @@
 # the detonation chamber                                    #
 #############################################################
 
-import socket, threading, os, sys, random
+import socket, threading, os, sys, random, ConfigParser
 from subprocess import Popen, PIPE, STDOUT
 from time import sleep
 
@@ -16,15 +16,16 @@ class telnetClientThread(threading.Thread):
 # Takes in commands from control, executes them, sends back STDOUT
 # Whitelists and emulates certain commands
 
-    def __init__(self,(conn,addr)):
+    def __init__(self,(conn,addr), user):
         self.conn=conn
         self.addr=addr
+        self.user = user
         print("Connected with SIREN control at {}...".format(self.addr[0]))
         threading.Thread.__init__(self)
 
 
     def run(self):
-        path = "/home/srodgers"
+        path = "/home/" + self.user
         while True:
             try:
                 cmd = self.conn.recv(256)
@@ -58,7 +59,7 @@ class telnetClientThread(threading.Thread):
                         self.conn.send(path + ";")
                     else:
                         # Clean path for detonation chamber use
-                        cmdlist[1] = cmdlist[1].replace("admin", "srodgers")
+                        cmdlist[1] = cmdlist[1].replace("admin", self.user)
                         if cmdlist[1][0] == '/':
                             # Check if path exists from root
                             if os.path.isdir(cmdlist[1]):
@@ -179,6 +180,9 @@ class telnetClientThread(threading.Thread):
     def stop(self):
         self.conn.close()
 
+config = ConfigParser.ConfigParser()
+config.read('../siren.cfg')
+user = config.get('Detonation Chamber', 'user')
 # Listen on port 23
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 telsock.bind(('', 23))
@@ -189,7 +193,7 @@ while 1:
     try:
         newconn = telsock.accept()
         print(newconn)
-        th = telnetClientThread(newconn)
+        th = telnetClientThread(newconn, user)
         threads.append(th)
         th.start()
     except KeyboardInterrupt:

@@ -15,13 +15,7 @@ from binascii import hexlify
 import netifaces as ni
 from time import sleep
 
-import base64
-import datetime
-import threading
-import socket
-import traceback
-import sys
-import paramiko
+import base64, datetime, threading, socket, traceback, sys, paramiko, ConfigParser
 from paramiko.py3compat import u
 
 
@@ -130,7 +124,7 @@ class ssh_thread(threading.Thread):
 # Spawned on connection from client
 # Spawns SSH Interface object
 
-    def __init__(self, (client, addr), linaddr, pubkey, iface):
+    def __init__(self, (client, addr), linaddr, pubkey, iface, detuser):
         threading.Thread.__init__(self)
         self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.logsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -138,6 +132,7 @@ class ssh_thread(threading.Thread):
         self.addr = addr
         self.pubkey = pubkey
         self.iface = iface
+        self.detuser = detuser
         # winconn = self.winsock.connect((winaddr, 23))
         try:
             self.logsock.connect(('127.0.0.1', 1338))
@@ -209,7 +204,7 @@ class ssh_thread(threading.Thread):
             resplist = response.split(";")
             path = resplist[0]
             # Sanitize response from chamber to replace chamber username with SIREN username
-            path = path.replace("srodgers", sshServer.username)
+            path = path.replace(self.detuser, sshServer.username)
             while True:
                 # Replace home directory with ~
                 path = path.replace("/home/" + sshServer.username, "~")
@@ -268,13 +263,13 @@ class ssh_thread(threading.Thread):
                     resplist = response.split(";")
                     path = resplist[0]
                     # Sanitize path
-                    path = path.replace("srodgers", sshServer.username)
+                    path = path.replace(self.detuser, sshServer.username)
                     if resplist[1] != '':
                         # Sanitize response
                         chanresponse = '\r\n'.join(resplist[1].split('\n'))
-                        chanresponse = chanresponse.replace("\nsrodgers", '\n' + sshServer.username)
-                        chanresponse = chanresponse.replace("srodgers\n", sshServer.username + '\n')
-                        chanresponse = chanresponse.replace("srodgers", sshServer.username)
+                        chanresponse = chanresponse.replace('\n'+self.detuser, '\n' + sshServer.username)
+                        chanresponse = chanresponse.replace(self.detuser+'\n', sshServer.username + '\n')
+                        chanresponse = chanresponse.replace(self.detuser, sshServer.username)
                         # Add clean carriage return/newline characters
                         if chanresponse[-2:] != "\r\n":
                             chanresponse = chanresponse + '\r\n'
@@ -310,15 +305,14 @@ class ssh_thread(threading.Thread):
 
 class ssh_ctrl(threading.Thread):
 
-    def __init__(self, pubkey, iface):
+    def __init__(self, pubkey):
         threading.Thread.__init__(self)
         self.pubkey = pubkey
-        self.iface = iface
-        detaddrs = open("siren.config", mode="r")
-        addrs = detaddrs.read()
-        spaddrs = addrs.split('\n')
-        self.linaddr = spaddrs[0]
-        detaddrs.close()
+        config = ConfigParser.ConfigParser()
+        config.read('siren.cfg')
+        self.iface = config.get('Interfaces', 'interface')
+        self.linaddr = config.get('Detonation Chamber', 'host')
+        self.detuser = config.get('Detonation Chamber', 'user')
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -339,7 +333,7 @@ class ssh_ctrl(threading.Thread):
                     self.sock.listen(50)
                     newconn = self.sock.accept()
                     # Spawn handler thread and start it
-                    th = ssh_thread(newconn, self.linaddr, self.pubkey, self.iface)
+                    th = ssh_thread(newconn, self.linaddr, self.pubkey, self.iface, self.detuser)
                     th.start()
                     # Append it to thread list
                     self.threads.append(th)
