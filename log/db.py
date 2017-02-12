@@ -7,7 +7,7 @@
 # text and MySQL logging facility                           #
 #############################################################
 
-import threading, MySQLdb, sys
+import threading, MySQLdb, sys, json, urllib2
 
 
 class logger_store(threading.Thread):
@@ -36,9 +36,17 @@ class logger_store(threading.Thread):
                     args = data.split(';')
                     # generate unique ids
                     if args[0] == "SESSION":
+                        georaw = urllib2.urlopen("http://atlas.dlinkddns.com/{}".format(args[3]))
+                        geojson = json.load(georaw)
                         with open('log/log.txt', mode='a') as f:
                             f.write("{}: Client connected from address {}\n".format(args[1], args[3]))
                         self.cursor.execute("insert into SESSION values(NULL,'{}','{}','{}','{}','{}',{},{});".format(args[1], args[2], args[3], args[4], args[5], args[6], args[7]))
+                        self.cursor.execute("select session_id from SESSION where source_ip='{}'".format(args[3]))
+                        id = self.cursor.fetchone()[0]
+                        row = self.cursor.fetchone()
+                        while row is not None:
+                            row = self.cursor.fetchone()
+                        self.cursor.execute("insert into GEO values(NULL,'{}','{}','{}','{}','{}','{}',{},{}".format(id, geojson["country_code"], geojson["country_name"], geojson["region_code"], geojson["region_name"], geojson["city"], geojson["latitude"], geojson["longitude"]))
                     if args[0] == "UPDATE":
                         with open('log/log.txt', mode='a') as f:
                             f.write("Client closed connection at time {}\n".format(args[1]))

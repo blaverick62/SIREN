@@ -26,25 +26,7 @@ $(document).ready(function(){
             var destips = JSON.parse(data[10]);
             var protocols = JSON.parse(data[11]);
             var localports = JSON.parse(data[12]);
-            var remoteports = JSON.parse(data[13]);
-
-
-            //***************************************************
-            // Get Geolocation Data
-            //***************************************************
-
-            var atlassock = new WebSocket('ws//67.172.130.92:80/');
-
-            altlassock.send("SIREN")
-            var geodata = [];
-            atlassock.onmessage = function(event){
-                geodata.push(event.data);
-                console.log(event.data);
-            }
-
-            for(i = 0; i < ips.length; i++){
-                atlassock.send(ips[i]);
-            }
+            var remoteports = JSON.parse(data[13]);cd 
 
             //***************************************************
             //  IP Address Frequency Chart
