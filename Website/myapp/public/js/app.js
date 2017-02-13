@@ -29,14 +29,39 @@ $(document).ready(function(){
             var remoteports = JSON.parse(data[13]);
             var geodata = JSON.parse(data[14]);
 
-            var geo_sessions = geodata[0];
-            var country_codes = geodata[1];
-            var country_names = geodata[2];
-            var region_codes = geodata[3];
-            var region_names = geodata[4];
-            var cities = geodata[5];
-            var latitudes = geodata[6];
-            var longitudes = geodata[7];
+            var geo_sessions;
+            var country_codes;
+            var country_names;
+            var region_codes;
+            var region_names;
+            var cities;
+            var latitudes;
+            var longitudes;
+
+            for(i=0; i<geodata.length; i++){
+                geo_sessions.push(geodata[i][0])
+            }
+            for(i=0; i<geodata.length; i++){
+                country_codes.push(geodata[i][1])
+            }
+            for(i=0; i<geodata.length; i++){
+                country_names.push(geodata[i][2])
+            }
+            for(i=0; i<geodata.length; i++){
+                region_codes.push(geodata[i][3])
+            }
+            for(i=0; i<geodata.length; i++){
+                region_names.push(geodata[i][4])
+            }
+            for(i=0; i<geodata.length; i++){
+                cities.push(geodata[i][5])
+            }
+            for(i=0; i<geodata.length; i++){
+                latitudes.push(geodata[i][6])
+            }
+            for(i=0; i<geodata.length; i++){
+                longitudes.push(geodata[i][7])
+            }
             console.log(country_names);
             console.log(latitudes);
 
