@@ -58,7 +58,7 @@ class telnetServerThread(threading.Thread):
             self.conn.send("password: ")
             password = self.conn.recv(256)
             password = password[:-2]
-            with open('server/users.txt', mode='r') as users:
+            with open('docs/users.txt', mode='r') as users:
                 for line in users:
                     auth = line.split(':')
                     if(username == auth[0] and password == auth[1]):
@@ -153,7 +153,7 @@ class telnet_ctrl(threading.Thread):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.settimeout(30)
         config = ConfigParser.ConfigParser()
-        config.read('siren.cfg')
+        config.read('docs/siren.cfg')
         self.iface = config.get('Interfaces', 'interface')
         self.linaddr = config.get('Detonation Chamber', 'host')
         self.winaddr = '0.0.0.0'

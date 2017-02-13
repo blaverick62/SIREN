@@ -48,7 +48,7 @@ class SSHInterface(paramiko.ServerInterface):
 
     def check_auth_password(self, username, password):
         # Override authorization with password to include logging
-        with open('server/users.txt', mode='r') as users:
+        with open('docs/users.txt', mode='r') as users:
             for line in users:
                 auth = line.split(':')
                 if username == auth[0] and password == auth[1]:
@@ -64,7 +64,7 @@ class SSHInterface(paramiko.ServerInterface):
     def check_auth_publickey(self, username, key):
         # Log username and public keys used
         print('Auth attempt with key: ' + u(hexlify(key.get_fingerprint())))
-        with open('server.users.txt', mode='r') as users:
+        with open('docs/users.txt', mode='r') as users:
             for line in users:
                 auth = line.split(':')
                 if username == auth[0] and key == self.pubkey:
@@ -134,6 +134,7 @@ class ssh_thread(threading.Thread):
         self.iface = iface
         self.detuser = detuser
         # winconn = self.winsock.connect((winaddr, 23))
+        paramiko.util.log_to_file('sirenssh.log')
         try:
             self.logsock.connect(('127.0.0.1', 1338))
         except socket.error as e:
@@ -196,7 +197,7 @@ class ssh_thread(threading.Thread):
                 sys.exit(1)
 
             # Send false welcome message and working directory
-            with open('intro.txt', mode='r') as f:
+            with open('docs/intro.txt', mode='r') as f:
                 intro = f.read()
             self.chan.send(intro)
             self.linsock.send('pwd')
@@ -309,7 +310,7 @@ class ssh_ctrl(threading.Thread):
         threading.Thread.__init__(self)
         self.pubkey = pubkey
         config = ConfigParser.ConfigParser()
-        config.read('siren.cfg')
+        config.read('docs/siren.cfg')
         self.iface = config.get('Interfaces', 'interface')
         self.linaddr = config.get('Detonation Chamber', 'host')
         self.detuser = config.get('Detonation Chamber', 'user')

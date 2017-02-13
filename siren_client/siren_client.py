@@ -181,7 +181,7 @@ class telnetClientThread(threading.Thread):
         self.conn.close()
 
 config = ConfigParser.ConfigParser()
-config.read('../siren.cfg')
+config.read('../docs/siren.cfg')
 user = config.get('Detonation Chamber', 'user')
 # Listen on port 23
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
