@@ -29,6 +29,8 @@ $(document).ready(function(){
             var remoteports = JSON.parse(data[13]);
             var geodata = JSON.parse(data[14]);
 
+            console.log(geodata)
+
             var geo_sessions = [];
             var country_codes = [];
             var country_names = [];
@@ -39,28 +41,28 @@ $(document).ready(function(){
             var longitudes = [];
 
             for(i=0; i<geodata.length; i++){
-                geo_sessions.push(geodata[i][0])
+                geo_sessions.push(geodata[i][1])
             }
             for(i=0; i<geodata.length; i++){
-                country_codes.push(geodata[i][1])
+                country_codes.push(geodata[i][2])
             }
             for(i=0; i<geodata.length; i++){
-                country_names.push(geodata[i][2])
+                country_names.push(geodata[i][3])
             }
             for(i=0; i<geodata.length; i++){
-                region_codes.push(geodata[i][3])
+                region_codes.push(geodata[i][4])
             }
             for(i=0; i<geodata.length; i++){
-                region_names.push(geodata[i][4])
+                region_names.push(geodata[i][5])
             }
             for(i=0; i<geodata.length; i++){
-                cities.push(geodata[i][5])
+                cities.push(geodata[i][6])
             }
             for(i=0; i<geodata.length; i++){
-                latitudes.push(geodata[i][6])
+                latitudes.push(geodata[i][7])
             }
             for(i=0; i<geodata.length; i++){
-                longitudes.push(geodata[i][7])
+                longitudes.push(geodata[i][8])
             }
             console.log(country_names);
             console.log(latitudes);
