@@ -199,6 +199,7 @@ class ssh_thread(threading.Thread):
             # Send false welcome message and working directory
             with open('docs/intro.txt', mode='r') as f:
                 intro = f.read()
+            intro = intro.replace('\n', '\r\n')
             self.chan.send(intro)
             self.linsock.send('pwd')
             response = self.linsock.recv(256)

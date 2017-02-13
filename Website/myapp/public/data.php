@@ -178,6 +178,18 @@ if ($result=mysqli_query($conn,$queryrem))
     mysqli_free_result($result);
 }
 
+$querygeo = sprintf("SELECT * FROM GEO;");
+$datageo = array();
+if ($result=mysqli_query($conn,$querygeo))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $datageo[] = $row[0];
+    }
+  // Free result set
+    mysqli_free_result($result);
+}
+
 //$querypass = sprintf("SELECT passwd FROM AUTH;");
 
 //$resultpass = $conn->query($querypass);
@@ -196,6 +208,7 @@ $destips = json_encode($destip);
 $protocol = json_encode($dataprot);
 $localport = json_encode($datasrc);
 $remoteport = json_encode($datarem);
+$geodata = json_encode($datageo);
 
 $dataout = array();
 $dataout[0] = $usernames;
@@ -212,6 +225,7 @@ $dataout[10] = $destips;
 $dataout[11] = $protocol;
 $dataout[12] = $localport;
 $dataout[13] = $remoteport;
+$dataout[14] = $geodata;
 
 echo json_encode($dataout);
 
