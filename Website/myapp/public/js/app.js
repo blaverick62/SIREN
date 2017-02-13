@@ -29,14 +29,14 @@ $(document).ready(function(){
             var remoteports = JSON.parse(data[13]);
             var geodata = JSON.parse(data[14]);
 
-            var geo_sessions;
-            var country_codes;
-            var country_names;
-            var region_codes;
-            var region_names;
-            var cities;
-            var latitudes;
-            var longitudes;
+            var geo_sessions = [];
+            var country_codes = [];
+            var country_names = [];
+            var region_codes = [];
+            var region_names = [];
+            var cities = [];
+            var latitudes = [];
+            var longitudes = [];
 
             for(i=0; i<geodata.length; i++){
                 geo_sessions.push(geodata[i][0])
