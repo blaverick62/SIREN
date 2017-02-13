@@ -29,7 +29,16 @@ $(document).ready(function(){
             var remoteports = JSON.parse(data[13]);
             var geodata = JSON.parse(data[14]);
 
-            console.log(geodata);
+            var geo_sessions = geodata[0];
+            var country_codes = geodata[1];
+            var country_names = geodata[2];
+            var region_codes = geodata[3];
+            var region_names = geodata[4];
+            var cities = geodata[5];
+            var latitudes = geodata[6];
+            var longitudes = geodatap[7];
+            console.log(country_names);
+            console.log(latitudes);
 
             //***************************************************
             //  IP Address Frequency Chart
