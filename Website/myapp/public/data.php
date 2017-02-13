@@ -184,7 +184,7 @@ if ($result=mysqli_query($conn,$querygeo))
     {
   // Fetch one and one row
     while ($row=mysqli_fetch_row($result)){
-        $datageo[] = $row[0];
+        $datageo[] = $row;
     }
   // Free result set
     mysqli_free_result($result);
