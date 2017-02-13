@@ -36,7 +36,7 @@ $(document).ready(function(){
             var region_names = geodata[4];
             var cities = geodata[5];
             var latitudes = geodata[6];
-            var longitudes = geodatap[7];
+            var longitudes = geodata[7];
             console.log(country_names);
             console.log(latitudes);
 
