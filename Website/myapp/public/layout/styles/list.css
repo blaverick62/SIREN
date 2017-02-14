@@ -114,3 +114,7 @@ html{
     background-color: black;
     font-family: Verdana, sans-serif;
 }
+
+th{
+    background-color: blue;
+}

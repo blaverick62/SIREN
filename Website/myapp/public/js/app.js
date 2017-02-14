@@ -260,9 +260,9 @@ $(document).ready(function(){
             console.log("ips from commands")
             console.log(cmdips);
 
-            var cmdlist = "<tr><td>Command</td><td>Source IP Address</td><td>Destination IP Address</td><td>Protocol</td><td>Local Port</td><td>Remote Port</td><td>Time Stamp</td></tr>";
+            var cmdlist = "";
             for(i = 0; i < commands.length; i++){
-                cmdlist = cmdlist+"<tr><td>"+commands[i]+"</td><td>"+cmdips[i]+"</td><td>"+cmddests[i]+"</td><td>"+cmdprotocols[i]+"</td><td>"+cmdlocports[i]+"</td><td>"+cmdremports[i]+"</td><td>"+cmdtimes[i]+"</td></tr>";
+                cmdlist = "<tr><td>"+commands[i]+"</td><td>"+cmdips[i]+"</td><td>"+cmddests[i]+"</td><td>"+cmdprotocols[i]+"</td><td>"+cmdlocports[i]+"</td><td>"+cmdremports[i]+"</td><td>"+cmdtimes[i]+"</td></tr>";
             }
             $('#input').html(cmdlist);
 
