@@ -115,6 +115,16 @@ html{
     font-family: Verdana, sans-serif;
 }
 
+table {
+    background-color: lime;
+}
+
 th{
-    background-color: blue;
+    background-color: dimgray;
+    padding: 7px 10px 10px 10px;
+    color: limegreen;
+}
+
+td{
+    background-color: silver;
 }
