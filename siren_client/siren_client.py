@@ -200,4 +200,6 @@ while 1:
         for i in threads:
             i.stop()
         sys.exit(0)
+    except socket.timeout:
+        pass
 

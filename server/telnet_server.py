@@ -181,10 +181,8 @@ class telnet_ctrl(threading.Thread):
                 print("Keyboard interrupt caught")
                 self.stop()
                 sys.exit()
-            except socket.gaierror:
-                print("General Exception in telnet control")
-                self.stop()
-                sys.exit()
+            except socket.timeout:
+                pass
 
     def stop(self):
         for th in self.threads:
