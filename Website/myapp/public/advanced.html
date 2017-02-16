@@ -18,6 +18,9 @@
 	<script type="text/javascript" src="js/angular.min.js"></script>
 	<script type="text/javascript" src="js/ang.js"></script>
 	<script type="text/javascript" src="js/app.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+	<script src="/datamaps.world.min.js"></script>
 
     <div class="topnav">
         <ul>
@@ -25,50 +28,41 @@
             <li class="active"><a href="pages/index.html">Advanced View</a></li>
         </ul>
 	</div>
-	<div class="chart-container">
-		<div id="command-list" >
-			<!--<h1 id="table-label">Master Table</h1>
-			<table>
-				<thead>
-					<tr>
-						<th>Command</th>
-						<th>Source IP Address</th>
-						<th>Destination IP Address</th>
-						<th>Protocol</th>
-						<th>Local Port</th>
-						<th>Remote Port</th>
-						<th>Time Stamp</th>
-					</tr>
-				</thead>
-				<tbody id="input"></tbody>
-			</table>//-->
-			<table class="data">
-				<tr>
-					<th>Entry Header 1</th>
-					<th>Entry Header 2</th>
-					<th>Entry Header 3</th>
-					<th>Entry Header 4</th>
-				</tr>
-				<tr>
-					<td>Entry First Line 1</td>
-					<td>Entry First Line 2</td>
-					<td>Entry First Line 3</td>
-					<td>Entry First Line 4</td>
-				</tr>
-				<tr>
-					<td>Entry Line 1</td>
-					<td>Entry Line 2</td>
-					<td>Entry Line 3</td>
-					<td>Entry Line 4</td>
-				</tr>
-				<tr>
-					<td>Entry Last Line 1</td>
-					<td>Entry Last Line 2</td>
-					<td>Entry Last Line 3</td>
-					<td>Entry Last Line 4</td>
-				</tr>
-			</table>
+	<div class="overarch">
+		<div class="chart-container">
+			<div id="command-list">
+				<h1 id="table-label">Master Table</h1>
+				<table>
+					<thead>
+						<tr>
+							<th>Command</th>
+							<th>Source IP Address</th>
+							<th>Destination IP Address</th>
+							<th>Protocol</th>
+							<th>Local Port</th>
+							<th>Remote Port</th>
+							<th>Time Stamp</th>
+						</tr>
+					</thead>
+					<tbody id="input"></tbody>
+				</table>
+
+			</div>
+
 		</div>
+
+
+		<div id="mapcontainer" style="width: 750px; height: 650px;">
+			<h1 id="maplabel">IP Address Geolocations</h1>
+			<script>
+				var map = new Datamap({
+					projection: 'mercator',
+					element: document.getElementById("mapcontainer")
+				});
+			</script>
+
+		</div>
+
 	</div>
 
 

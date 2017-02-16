@@ -12,6 +12,8 @@ $(document).ready(function(){
             // Data Acquisition
             //***************************************************
 
+
+
             console.log(data);
             var usernames = JSON.parse(data[0]);
             var passwords = JSON.parse(data[1]);

@@ -9,6 +9,10 @@ h3.graph-label{
     margin: 0px;
 }
 
+#maplabel{
+    color: white;
+}
+
 .topnav {
     background-color: forestgreen;
     height: 40px;
@@ -80,7 +84,7 @@ canvas.line{
 }
 
 .chart-container{
-    float: left;
+
     width: 620px;
 
 }
