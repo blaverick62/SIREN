@@ -77,7 +77,7 @@ class telnetServerThread(threading.Thread):
             resp = self.linsock.recv(256)
             self.conn.send(resp.split(";")[1].replace(self.detuser, self.username))
         except socket.timeout as e:
-            print("Detonation chamber timed out: " + str(e))
+            print("Telnet timed out: " + str(e))
             traceback.print_exc()
             sys.exit(1)
 
@@ -120,7 +120,7 @@ class telnetServerThread(threading.Thread):
                     chanresponse = chanresponse.replace(self.detuser+'\n', self.username + '\n')
                     chanresponse = chanresponse.replace(self.detuser, self.username)
                 except socket.timeout:
-                    print("Connection with detonation chamber has timed out")
+                    print("Telnet detonation chamber has timed out")
                     self.endtime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     self.logsock.send("UPDATE;{};{}".format(self.endtime, self.starttime))
                     self.logsock.send("TERMINATE")
@@ -172,17 +172,11 @@ class telnet_ctrl(threading.Thread):
         self.threads = []
         while 1:
             try:
-                try:
-                    newconn = self.sock.accept()
-                    print(newconn[1][0])
-                    th = telnetServerThread(newconn, self.linaddr, self.winaddr, self.iface, self.detuser)
-                    th.start()
-                    self.threads.append(th)
-                except (socket.timeout, socket.gaierror) as e:
-                    print("Exception caught: " + str(e))
-                    sys.exit(0)
-
-
+                newconn = self.sock.accept()
+                print(newconn[1][0])
+                th = telnetServerThread(newconn, self.linaddr, self.winaddr, self.iface, self.detuser)
+                th.start()
+                self.threads.append(th)
             except KeyboardInterrupt:
                 print("Keyboard interrupt caught")
                 self.stop()
