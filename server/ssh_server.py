@@ -132,8 +132,9 @@ class ssh_thread(threading.Thread):
         self.addr = addr
         self.pubkey = pubkey
         self.iface = iface
-        self.detuser = detuser
-        # winconn = self.winsock.connect((winaddr, 23))
+        self.detaddrs = linaddr
+        self.detusers = detuser
+        self.detsel = 0
         paramiko.util.log_to_file('sirenssh.log')
         try:
             self.logsock.connect(('127.0.0.1', 1338))
@@ -142,7 +143,7 @@ class ssh_thread(threading.Thread):
             traceback.print_exc()
             sys.exit(1)
         try:
-            self.linsock.connect((linaddr, 23))
+            self.linsock.connect((self.detaddrs[self.detsel], 23))
         except socket.error:
             print("Failed to connect to detonation chamber")
             sys.exit(1)
@@ -206,7 +207,7 @@ class ssh_thread(threading.Thread):
             resplist = response.split(";")
             path = resplist[0]
             # Sanitize response from chamber to replace chamber username with SIREN username
-            path = path.replace(self.detuser, sshServer.username)
+            path = path.replace(self.detusers[self.detsel], sshServer.username)
             while True:
                 # Replace home directory with ~
                 path = path.replace("/home/" + sshServer.username, "~")
@@ -265,13 +266,13 @@ class ssh_thread(threading.Thread):
                     resplist = response.split(";")
                     path = resplist[0]
                     # Sanitize path
-                    path = path.replace(self.detuser, sshServer.username)
+                    path = path.replace(self.detusers[self.detsel], sshServer.username)
                     if resplist[1] != '':
                         # Sanitize response
                         chanresponse = '\r\n'.join(resplist[1].split('\n'))
-                        chanresponse = chanresponse.replace('\n'+self.detuser, '\n' + sshServer.username)
-                        chanresponse = chanresponse.replace(self.detuser+'\n', sshServer.username + '\n')
-                        chanresponse = chanresponse.replace(self.detuser, sshServer.username)
+                        chanresponse = chanresponse.replace('\n'+self.detusers[self.detaddrs], '\n' + sshServer.username)
+                        chanresponse = chanresponse.replace(self.detusers[self.detsel]+'\n', sshServer.username + '\n')
+                        chanresponse = chanresponse.replace(self.detusers[self.detsel], sshServer.username)
                         # Add clean carriage return/newline characters
                         if chanresponse[-2:] != "\r\n":
                             chanresponse = chanresponse + '\r\n'
@@ -313,8 +314,8 @@ class ssh_ctrl(threading.Thread):
         config = ConfigParser.ConfigParser()
         config.read('docs/siren.cfg')
         self.iface = config.get('Interfaces', 'interface')
-        self.linaddr = config.get('Detonation Chamber', 'host')
-        self.detuser = config.get('Detonation Chamber', 'user')
+        self.detaddrs = config.get('Detonation Chamber', 'host').split(',')
+        self.detusers = config.get('Detonation Chamber', 'user').split(',')
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -335,7 +336,7 @@ class ssh_ctrl(threading.Thread):
                     self.sock.listen(50)
                     newconn = self.sock.accept()
                     # Spawn handler thread and start it
-                    th = ssh_thread(newconn, self.linaddr, self.pubkey, self.iface, self.detuser)
+                    th = ssh_thread(newconn, self.detaddrs, self.pubkey, self.iface, self.detusers)
                     th.start()
                     # Append it to thread list
                     self.threads.append(th)
