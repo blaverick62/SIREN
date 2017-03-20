@@ -199,34 +199,33 @@ class ssh_thread(threading.Thread):
 
             # Send false welcome message and working directory
             self.linsock.send('siversion')
-            response = self.linsock.recv(256)
-            if response == "L":
+            ver = self.linsock.recv(256)
+            if ver == "L":
                 with open('docs/linuxintro.txt', mode='r') as f:
                     intro = f.read()
             else:
                 with open('docs/windowsintro.txt', mode='r') as f:
                     intro = f.read()
             intro = intro.replace('\n', '\r\n')
-            self.chan.send(intro)
-            if response == "L":
+            self.chan.send(intro + '\r\n')
+            if ver == "L":
                 self.linsock.send('pwd')
             else:
                 self.linsock.send('cd .')
             response = self.linsock.recv(256)
-            print(self.detusers[self.detsel])
-            print(response)
             resplist = response.split(";")
             path = resplist[0]
             # Sanitize response from chamber to replace chamber username with SIREN username
-            print(path)
 
             path = path.replace(self.detusers[self.detsel], sshServer.username)
-            print(path)
             while True:
                 # Replace home directory with ~
                 path = path.replace("/home/" + sshServer.username, "~")
                 # Send real-looking SSH prompt
-                self.chan.send(sshServer.username + '@ubuntu:' + path + '$ ')
+                if ver == "L":
+                    self.chan.send(sshServer.username + '@ubuntu:' + path + '$ ')
+                else:
+                    self.chan.send(path + '>')
                 data = ""
 
                 # Wait for receive ready flag
@@ -256,7 +255,7 @@ class ssh_thread(threading.Thread):
                     sys.exit(0)
                 timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 # Detect SSH pivots to other machines
-                if "ssh" in data:
+                if data[:3] == "ssh":
                     datarray = data.split()
                     self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, data))
                     # Parse into username and IP address of target
@@ -271,7 +270,31 @@ class ssh_thread(threading.Thread):
                                 sel = ind
                         if sel != -1:
                             # If in network, start new thread with connection to new detonation chamber
-                            th = ssh_thread((self.client, (sshuser,sshaddr)), self.detaddrs, self.pubkey, self.iface, self.detusers, sel)
+                            self.detsel = sel
+                            self.linsock.close()
+                            # Change detonation socket to new address
+                            self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                            self.linsock.connect((self.detaddrs[self.detsel], 23))
+                            self.linsock.send('siversion')
+                            ver = self.linsock.recv(256)
+                            if ver == "L":
+                                with open('docs/linuxintro.txt', mode='r') as f:
+                                    intro = f.read()
+                            else:
+                                with open('docs/windowsintro.txt', mode='r') as f:
+                                    intro = f.read()
+                            intro = intro.replace('\n', '\r\n')
+                            self.chan.send(intro + '\r\n')
+                            if ver == "L":
+                                self.linsock.send('pwd')
+                            else:
+                                self.linsock.send('cd .')
+                            response = self.linsock.recv(256)
+                            resplist = response.split(";")
+                            path = resplist[0]
+                            # Sanitize response from chamber to replace chamber username with SIREN username
+
+                            path = path.replace(self.detusers[self.detsel], sshServer.username)
                         else:
                             # If not, sleep and send back error
                             sleep(30)

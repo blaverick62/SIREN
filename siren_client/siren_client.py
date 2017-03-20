@@ -34,7 +34,7 @@ class telnetClientThread(threading.Thread):
         if ver == "L":
             path = "/home/" + self.user
         else:
-            path = "C:\Users\ " + self.user + ">"
+            path = "C:\Users\ " + self.user
         while True:
             try:
                 cmd = self.conn.recv(256)
