@@ -25,7 +25,16 @@ class telnetClientThread(threading.Thread):
 
 
     def run(self):
-        path = "/home/" + self.user
+        # Check which operating system we are using
+        try:
+            import termios
+            ver = "L"
+        except ImportError:
+            ver = "W"
+        if ver == "L":
+            path = "/home/" + self.user
+        else:
+            path = "C:\Users\ " + self.user + ">"
         while True:
             try:
                 cmd = self.conn.recv(256)
@@ -84,13 +93,13 @@ class telnetClientThread(threading.Thread):
                             else:
                                 self.conn.send(path + ";" + "bash: cd: " + cmdlist[1] + ": No such file or directory")
                 # Check for cat of password file
-                elif cmdlist[0] == "cat" and (cmdlist[1] == "/etc/passwd" or cmdlist[1] == "passwd" or cmdlist[1] == "/etc/passwd-" or cmdlist[1] == "passwd-"):
+                elif (cmdlist[0] == "cat" and (cmdlist[1] == "/etc/passwd" or cmdlist[1] == "passwd" or cmdlist[1] == "/etc/passwd-" or cmdlist[1] == "passwd-")) and ver == "L":
                     # Read in and send back fake password file
                     with open('sirenpass.txt', mode='r') as f:
                         falsepass = f.read()
                     self.conn.send(path + ";" + falsepass)
                 # Catch sudo and let them know that's not cool
-                elif cmdlist[0] == "sudo" or cmdlist[0] == "su":
+                elif (cmdlist[0] == "sudo" or cmdlist[0] == "su") and ver == "L":
                     self.conn.send(path + ";" + "lol yeah nah m8 ill fuckin nip ya")
                 # Check for netstat
                 elif cmdlist[0] == "netstat":
