@@ -287,7 +287,6 @@ class ssh_thread(threading.Thread):
                                             passw = passw[:-1]
                                         else:
                                             passw = passw + rec
-                                        self.chan.send(rec)
                                     self.chan.send('\n')
                                     # Cut off carriage return character
                                     passw = passw[:-1]
@@ -296,9 +295,8 @@ class ssh_thread(threading.Thread):
                                         if user[0] == sshuser and user[1] == passw:
                                             success = 1
                                             break
-                                        else:
-                                            self.chan.send("Permission denied")
-                                            tries += 1
+                                    self.chan.send("Permission denied")
+                                    tries += 1
                             if success == 0:
                                 self.chan.send(" (publickey,password).\r\n")
                                 continue
@@ -336,6 +334,7 @@ class ssh_thread(threading.Thread):
                     except IndexError:
                         # If string cannot be parsed, send usage error
                         self.chan.send("usage: ssh [-1246AaCfGgKkMNnqsTtVvXxYy] [-b bind_address] [-c cipher_spec]\r\n\t[-D [bind_address:]port] [-E log_file] [-e escape_char]\r\n\t[-F configfile] [-I pkcs11] [-i identity_file] [-L address]\r\n\t[-l login_name] [-m mac_spec] [-O ctl_cmd] [-o option] [-p port]\r\n\t[-Q query_option] [-R address] [-S ctl_path] [-W host:port]\r\n\t[-w local_tun[:remote_tun]] [user@]hostname [command]")
+                        continue
                 # Check for evidence of SQL Injection, don't send to logger
                 if "'" in data:
                     print("SQL Injection detected! Isolating threat...")
