@@ -124,7 +124,7 @@ class ssh_thread(threading.Thread):
 # Spawned on connection from client
 # Spawns SSH Interface object
 
-    def __init__(self, (client, addr), linaddr, pubkey, iface, detuser):
+    def __init__(self, (client, addr), linaddr, pubkey, iface, detuser, index):
         threading.Thread.__init__(self)
         self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.logsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -134,7 +134,7 @@ class ssh_thread(threading.Thread):
         self.iface = iface
         self.detaddrs = linaddr
         self.detusers = detuser
-        self.detsel = 0
+        self.detsel = index
         paramiko.util.log_to_file('sirenssh.log')
         try:
             self.logsock.connect(('127.0.0.1', 1338))
@@ -241,7 +241,30 @@ class ssh_thread(threading.Thread):
                     self.chan.close()
                     sys.exit(0)
                 timestmp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
+                # Detect SSH pivots to other machines
+                if "ssh" in data:
+                    datarray = data.split()
+                    self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, data))
+                    # Parse into username and IP address of target
+                    try:
+                        addrarray = datarray[1].split("@")
+                        sshaddr = addrarray[1]
+                        sshuser = addrarray[0]
+                        sel = -1
+                        # Check if target is in the network
+                        for ind in range(len(self.detaddrs)):
+                            if sshaddr == self.detaddrs[ind]:
+                                sel = ind
+                        if sel != -1:
+                            # If in network, start new thread with connection to new detonation chamber
+                            th = ssh_thread((self.client, (sshuser,sshaddr)), self.detaddrs, self.pubkey, self.iface, self.detusers, sel)
+                        else:
+                            # If not, sleep and send back error
+                            sleep(30)
+                            self.chan.send("ssh: connect to host " + sshaddr + " port 22: Connection refused")
+                    except IndexError:
+                        # If string cannot be parsed, send usage error
+                        self.chan.send("usage: ssh [-1246AaCfGgKkMNnqsTtVvXxYy] [-b bind_address] [-c cipher_spec]\r\n\t[-D [bind_address:]port] [-E log_file] [-e escape_char]\r\n\t[-F configfile] [-I pkcs11] [-i identity_file] [-L address]\r\n\t[-l login_name] [-m mac_spec] [-O ctl_cmd] [-o option] [-p port]\r\n\t[-Q query_option] [-R address] [-S ctl_path] [-W host:port]\r\n\t[-w local_tun[:remote_tun]] [user@]hostname [command]")
                 # Check for evidence of SQL Injection, don't send to logger
                 if "'" in data:
                     print("SQL Injection detected! Isolating threat...")
@@ -336,7 +359,7 @@ class ssh_ctrl(threading.Thread):
                     self.sock.listen(50)
                     newconn = self.sock.accept()
                     # Spawn handler thread and start it
-                    th = ssh_thread(newconn, self.detaddrs, self.pubkey, self.iface, self.detusers)
+                    th = ssh_thread(newconn, self.detaddrs, self.pubkey, self.iface, self.detusers, 0)
                     th.start()
                     # Append it to thread list
                     self.threads.append(th)
