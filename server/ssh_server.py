@@ -270,9 +270,43 @@ class ssh_thread(threading.Thread):
                                 sel = ind
                         if sel != -1:
                             # If in network, start new thread with connection to new detonation chamber
+                            success = 0
+                            tries = 0
+                            with open('docs/users.txt') as f:
+                                while success == 0 and tries < 3:
+                                    if tries > 0:
+                                        self.chan.send(", please try again.\r\n")
+                                    self.chan.send(sshuser + "@" + sshaddr + "'s password: ")
+                                    passw = ""
+                                    while self.chan.recv_ready() == False:
+                                        pass
+                                    # Build input string until enter character is found
+                                    while '\r' not in passw:
+                                        rec = self.chan.recv(256)
+                                        if rec == '\b':
+                                            passw = passw[:-1]
+                                        else:
+                                            passw = passw + rec
+                                        self.chan.send(rec)
+                                    self.chan.send('\n')
+                                    # Cut off carriage return character
+                                    passw = passw[:-1]
+                                    for line in f:
+                                        user = line.split(':')
+                                        if user[0] == sshuser and user[1] == passw:
+                                            success = 1
+                                            break
+                                        else:
+                                            self.chan.send("Permission denied")
+                                            tries += 1
+                            if success == 0:
+                                self.chan.send(" (publickey,password).\r\n")
+                                continue
                             self.detsel = sel
+                            self.linsock.send("TERMINATE")
                             self.linsock.close()
                             # Change detonation socket to new address
+
                             self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                             self.linsock.connect((self.detaddrs[self.detsel], 23))
                             self.linsock.send('siversion')

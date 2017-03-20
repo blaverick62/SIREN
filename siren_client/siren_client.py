@@ -177,7 +177,11 @@ class telnetClientThread(threading.Thread):
                     # Use subprocess popen to run command
                     # connect to STDIN and STDOUT
                     # run with path prepended
-                    proc = Popen("(cd " + path + " && " + cmd + ")", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                    if ver == "L":
+                        proc = Popen("(cd " + path + " && " + cmd + ")", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                    else:
+                        proc = Popen("(cd " + path + " && " + cmd + ")", shell=True, stdin=PIPE, stdout=PIPE,
+                                     stderr=STDOUT)
                     cmdout = path + ";" + proc.stdout.read()
                     cmdout = cmdout.replace("siren", "")
                     cmdout = cmdout.replace("\nsiren", "")
