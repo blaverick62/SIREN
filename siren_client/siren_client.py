@@ -194,8 +194,18 @@ class telnetClientThread(threading.Thread):
 
 config = ConfigParser.ConfigParser()
 config.read('../docs/siren.cfg')
-user = config.get('Detonation Chamber', 'user')
+users = config.get('Detonation Chamber', 'user').split(',')
 # Listen on port 23
+try:
+    import termios
+    ver = "L"
+except ImportError:
+    ver = "W"
+
+if ver == "L":
+    user = users[0]
+else:
+    user = users[1]
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 telsock.bind(('', 23))
 telsock.listen(5)

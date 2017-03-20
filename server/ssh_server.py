@@ -213,10 +213,15 @@ class ssh_thread(threading.Thread):
             else:
                 self.linsock.send('cd .')
             response = self.linsock.recv(256)
+            print(self.detusers[self.detsel])
+            print(response)
             resplist = response.split(";")
             path = resplist[0]
             # Sanitize response from chamber to replace chamber username with SIREN username
+            print(path)
+
             path = path.replace(self.detusers[self.detsel], sshServer.username)
+            print(path)
             while True:
                 # Replace home directory with ~
                 path = path.replace("/home/" + sshServer.username, "~")
@@ -302,7 +307,7 @@ class ssh_thread(threading.Thread):
                     if resplist[1] != '':
                         # Sanitize response
                         chanresponse = '\r\n'.join(resplist[1].split('\n'))
-                        chanresponse = chanresponse.replace('\n'+self.detusers[self.detaddrs], '\n' + sshServer.username)
+                        chanresponse = chanresponse.replace('\n'+self.detusers[self.detsel], '\n' + sshServer.username)
                         chanresponse = chanresponse.replace(self.detusers[self.detsel]+'\n', sshServer.username + '\n')
                         chanresponse = chanresponse.replace(self.detusers[self.detsel], sshServer.username)
                         # Add clean carriage return/newline characters

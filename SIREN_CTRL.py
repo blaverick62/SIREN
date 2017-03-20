@@ -36,15 +36,15 @@ def main():
 
     # Start logger
     siren_log = logger()
-    #siren_log.setDaemon(True)
+    siren_log.setDaemon(True)
     siren_log.start()
     sleep(10)
 
     ssh_thread = ssh_ctrl(pubkey)
-    #ssh_thread.setDaemon(True)
+    ssh_thread.setDaemon(True)
 
     telnet_thread = telnet_ctrl()
-    #telnet_thread.setDaemon(True)
+    telnet_thread.setDaemon(True)
 
 
     # Start server threads\

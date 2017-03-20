@@ -24,8 +24,8 @@ class logger_store(threading.Thread):
                                   db=config.get('MySQL', 'database'))
         self.atlassock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.atlassock.connect(("atlas.dlinkddns.com", 80))
-        self.atlassock.recv(4098)
         self.atlassock.send("SIREN\r\n")
+        self.atlassock.recv(4098)
         self.cursor = self.db.cursor()
         for line in open("log/siren_schema.sql"):
             self.cursor.execute(line)
