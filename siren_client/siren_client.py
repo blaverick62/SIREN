@@ -44,11 +44,14 @@ class telnetClientThread(threading.Thread):
                 if cmdlist[0] == "TERMINATE":
                     print("Session closed")
                     return
+                # respond with version
+                if cmdlist[0] == "siversion":
+                    self.conn.send(ver)
 
                 # Check for change directory
                 # Emulates cd by parsing input to build a string representing the path
                 # Runs every other command with path included to provide realism
-                if cmdlist[0] == "cd":
+                elif cmdlist[0] == "cd":
                     # Check for parent
                     if cmdlist[1] == "..":
                         # Split path and remove last element of array to get parent

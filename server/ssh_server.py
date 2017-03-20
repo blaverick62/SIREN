@@ -198,11 +198,20 @@ class ssh_thread(threading.Thread):
                 sys.exit(1)
 
             # Send false welcome message and working directory
-            with open('docs/intro.txt', mode='r') as f:
-                intro = f.read()
+            self.linsock.send('siversion')
+            response = self.linsock.recv(256)
+            if response == "L":
+                with open('docs/linuxintro.txt', mode='r') as f:
+                    intro = f.read()
+            else:
+                with open('docs/windowsintro.txt', mode='r') as f:
+                    intro = f.read()
             intro = intro.replace('\n', '\r\n')
             self.chan.send(intro)
-            self.linsock.send('pwd')
+            if response == "L":
+                self.linsock.send('pwd')
+            else:
+                self.linsock.send('cd .')
             response = self.linsock.recv(256)
             resplist = response.split(";")
             path = resplist[0]
