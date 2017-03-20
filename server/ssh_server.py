@@ -275,8 +275,9 @@ class ssh_thread(threading.Thread):
                             with open('docs/users.txt') as f:
                                 while success == 0 and tries < 3:
                                     if tries > 0:
-                                        self.chan.send(", please try again.\r\n")
-                                    self.chan.send(sshuser + "@" + sshaddr + "'s password: ")
+                                        self.chan.send("Permission denied, please try again.\r\n" + sshuser + "@" + sshaddr + "'s password: ")
+                                    else:
+                                        self.chan.send(sshuser + "@" + sshaddr + "'s password: ")
                                     passw = ""
                                     while self.chan.recv_ready() == False:
                                         pass
@@ -295,10 +296,13 @@ class ssh_thread(threading.Thread):
                                         if user[0] == sshuser and user[1] == passw:
                                             success = 1
                                             break
-                                    self.chan.send("Permission denied")
+                                    self.logsock.send(
+                                        "AUTH;{};{};{};{};{}".format(self.starttime, success, sshuser, passw,
+                                                                     datetime.datetime.now().strftime(
+                                                                         '%Y-%m-%d %H:%M:%S')))
                                     tries += 1
                             if success == 0:
-                                self.chan.send(" (publickey,password).\r\n")
+                                self.chan.send("Permission denied (publickey,password).\r\n")
                                 continue
                             self.detsel = sel
                             self.linsock.send("TERMINATE")
@@ -330,7 +334,8 @@ class ssh_thread(threading.Thread):
                         else:
                             # If not, sleep and send back error
                             sleep(30)
-                            self.chan.send("ssh: connect to host " + sshaddr + " port 22: Connection refused")
+                            self.chan.send("ssh: connect to host " + sshaddr + " port 22: Connection refused\r\n")
+                            continue
                     except IndexError:
                         # If string cannot be parsed, send usage error
                         self.chan.send("usage: ssh [-1246AaCfGgKkMNnqsTtVvXxYy] [-b bind_address] [-c cipher_spec]\r\n\t[-D [bind_address:]port] [-E log_file] [-e escape_char]\r\n\t[-F configfile] [-I pkcs11] [-i identity_file] [-L address]\r\n\t[-l login_name] [-m mac_spec] [-O ctl_cmd] [-o option] [-p port]\r\n\t[-Q query_option] [-R address] [-S ctl_path] [-W host:port]\r\n\t[-w local_tun[:remote_tun]] [user@]hostname [command]")
