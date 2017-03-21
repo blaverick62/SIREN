@@ -149,6 +149,8 @@ class ssh_thread(threading.Thread):
             sys.exit(1)
 
     def run(self):
+        tty = "S"
+        hist = []
         # Allow GSS API and log start time of session
         DoGSSAPIKeyExchange = True
         self.starttime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -214,7 +216,7 @@ class ssh_thread(threading.Thread):
                 self.linsock.send('cd .')
             response = self.linsock.recv(256)
             resplist = response.split(";")
-            path = resplist[0]
+            path = resplist[0][1]
             # Sanitize response from chamber to replace chamber username with SIREN username
 
             path = path.replace(self.detusers[self.detsel], sshServer.username)
@@ -222,7 +224,7 @@ class ssh_thread(threading.Thread):
                 # Replace home directory with ~
                 path = path.replace("/home/" + sshServer.username, "~")
                 # Send real-looking SSH prompt
-                if ver == "L":
+                if ver == "L" and tty == "S":
                     self.chan.send(sshServer.username + '@ubuntu:' + path + '$ ')
                 else:
                     self.chan.send(path + '>')
@@ -338,8 +340,106 @@ class ssh_thread(threading.Thread):
                             continue
                     except IndexError:
                         # If string cannot be parsed, send usage error
-                        self.chan.send("usage: ssh [-1246AaCfGgKkMNnqsTtVvXxYy] [-b bind_address] [-c cipher_spec]\r\n\t[-D [bind_address:]port] [-E log_file] [-e escape_char]\r\n\t[-F configfile] [-I pkcs11] [-i identity_file] [-L address]\r\n\t[-l login_name] [-m mac_spec] [-O ctl_cmd] [-o option] [-p port]\r\n\t[-Q query_option] [-R address] [-S ctl_path] [-W host:port]\r\n\t[-w local_tun[:remote_tun]] [user@]hostname [command]")
+                        self.chan.send("usage: ssh [-1246AaCfGgKkMNnqsTtVvXxYy] [-b bind_address] [-c cipher_spec]\r\n\t[-D [bind_address:]port] [-E log_file] [-e escape_char]\r\n\t[-F configfile] [-I pkcs11] [-i identity_file] [-L address]\r\n\t[-l login_name] [-m mac_spec] [-O ctl_cmd] [-o option] [-p port]\r\n\t[-Q query_option] [-R address] [-S ctl_path] [-W host:port]\r\n\t[-w local_tun[:remote_tun]] [user@]hostname [command]\r\n")
                         continue
+
+#                elif data[:6] == "telnet":
+# #                    datarray = data.split()
+# #                    self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, data))
+# #                    # Parse into username and IP address of target
+# #                    try:
+# #                        teladdr = data[1]
+# #                        self.chan.send("Trying " + teladdr + "...")
+# #                        # Check if target is in the network
+# #                        for ind in range(len(self.detaddrs)):
+# #                            if teladdr == self.detaddrs[ind]:
+# #                                sel = ind
+# #                        if sel != -1:
+# #                            # If in network, start new thread with connection to new detonation chamber
+# #                            success = 0
+# #                            tries = 0
+# #                            with open('docs/users.txt') as f:
+# #                                while success == 0 and tries < 3:
+# #                                    self.chan.send("login: ")
+# #                                    teluser = ""
+# #                                    while self.chan.recv_ready() == False:
+# #                                        pass
+# #                                    # Build input string until enter character is found
+# #                                   while '\r' not in teluser:
+#  #                                       rec = self.chan.recv(256)
+# #                                        if rec == '\b':
+# #                                            teluser = teluser[:-1]
+# #                                        else:
+#  #                                           teluser = teluser + rec
+# #                                    self.chan.send('\n')
+# #                                    # Cut off carriage return character
+# #                                    teluser = teluser[:-1]
+#
+#  #                                   self.chan.send("password: ")
+#  #                                   passw = ""
+#   #                                  while self.chan.recv_ready() == False:
+#  #                                       pass
+#  #                                   # Build input string until enter character is found
+#  #                                   while '\r' not in passw:
+#  #                                       rec = self.chan.recv(256)
+#  #                                       if rec == '\b':
+#  #                                           passw = passw[:-1]
+#  #                                       else:
+#   #                                          passw = passw + rec
+#  #                                   self.chan.send('\n')
+#                                     # Cut off carriage return character
+#  #                                   passw = passw[:-1]
+#
+#  #                                   for line in f:
+#   #                                      user = line.split(':')
+#  #                                       if user[0] == teluser and user[1] == passw:
+#                                             success = 1
+#                                             break
+#                                     self.logsock.send(
+#                                         "AUTH;{};{};{};{};{}".format(self.starttime, success, teluser, passw,
+#                                                                      datetime.datetime.now().strftime(
+#                                                                          '%Y-%m-%d %H:%M:%S')))
+#                                     tries += 1
+#                             if success == 0:
+#                                 self.chan.send("Unauthorized.\r\n")
+#                                 continue
+#                             hist
+#                             self.detsel = sel
+#                             self.linsock.send("TERMINATE")
+#                             self.linsock.close()
+#                             # Change detonation socket to new address
+#                             tty = "T"
+#                             self.linsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#                             self.linsock.connect((self.detaddrs[self.detsel], 23))
+#                             self.linsock.send('siversion')
+#                             ver = self.linsock.recv(256)
+#                             if ver == "L":
+#                                 with open('docs/linuxintro.txt', mode='r') as f:
+#                                     intro = f.read()
+#                             else:
+#                                 with open('docs/windowsintro.txt', mode='r') as f:
+#                                     intro = f.read()
+#                             intro = intro.replace('\n', '\r\n')
+#                             self.chan.send(intro + '\r\n')
+#                             if ver == "L":
+#                                 self.linsock.send('pwd')
+#                             else:
+#                                 self.linsock.send('cd .')
+#                             response = self.linsock.recv(256)
+#                             resplist = response.split(";")
+#                             path = resplist[0]
+#                             # Sanitize response from chamber to replace chamber username with SIREN username
+#
+#                             path = path.replace(self.detusers[self.detsel], sshServer.username)
+#                         else:
+#                             # If not, sleep and send back error
+#                             sleep(30)
+#                             self.chan.send("telnet: Unable to connect to remote host: Connection refused\r\n")
+#                             continue
+#                     except IndexError:
+#                         # If string cannot be parsed, send usage error
+#                         self.chan.send("telnet: Unable to connect to remote host: Connection refused\r\n")
+#                         continue
                 # Check for evidence of SQL Injection, don't send to logger
                 if "'" in data:
                     print("SQL Injection detected! Isolating threat...")
