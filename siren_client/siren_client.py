@@ -29,8 +29,10 @@ class telnetClientThread(threading.Thread):
         try:
             import termios
             ver = "L"
+            slash = "/"
         except ImportError:
             ver = "W"
+            slash = "\\"
         if ver == "L":
             path = "/home/" + self.user
         else:
