@@ -35,8 +35,10 @@ class telnetClientThread(threading.Thread):
             slash = "\\"
         if ver == "L":
             path = "/home/" + self.user
+            spl = '/'
         else:
             path = "C:\Users" + "\\" + self.user
+            spl = "\\"
         while True:
             try:
                 cmd = self.conn.recv(256)
@@ -57,16 +59,16 @@ class telnetClientThread(threading.Thread):
                     # Check for parent
                     if cmdlist[1] == "..":
                         # Split path and remove last element of array to get parent
-                        pathlist = path.split("/")
+                        pathlist = path.split(spl)
                         pathlist = pathlist[1:]
                         if len(pathlist) > 1:
                             pathlist = pathlist[:-1]
                         if len(pathlist) > 1:
-                            path = "/".join(pathlist)
+                            path = spl.join(pathlist)
                         else:
                             path = pathlist[0]
-                        if path[0] != "/":
-                            path = "/" + path
+                        if path[0] != spl:
+                            path = spl + path
                         self.conn.send(path + ";")
                     # Do nothing for current
                     elif cmdlist[1] == ".":
@@ -74,7 +76,7 @@ class telnetClientThread(threading.Thread):
                     else:
                         # Clean path for detonation chamber use
                         cmdlist[1] = cmdlist[1].replace("admin", self.user)
-                        if cmdlist[1][0] == '/':
+                        if cmdlist[1][0] == spl:
                             # Check if path exists from root
                             if os.path.isdir(cmdlist[1]):
                                 # Don't allow access into siren directories
@@ -88,10 +90,10 @@ class telnetClientThread(threading.Thread):
                                 self.conn.send("bash: cd: " + cmdlist[1] + ": No such file or directory")
                         else:
                             # Check if path exists from current
-                            if os.path.isdir(path + "/" + cmdlist[1]):
+                            if os.path.isdir(path + spl + cmdlist[1]):
                                 if "siren" not in cmdlist[1]:
                                     # Change path to cd path plus current
-                                    path = path + "/" + cmdlist[1]
+                                    path = path + spl + cmdlist[1]
                                     self.conn.send(path + ";")
                                 else:
                                     self.conn.send(path + ";" + "bash: cd: " + cmdlist[1] + ": No such file or directory")
@@ -119,7 +121,7 @@ class telnetClientThread(threading.Thread):
                     print("ping caught")
                     # Open error file
                     with open('pingerr.txt', mode='r') as f:
-                        pingerr = f.read()
+                           pingerr = f.read()
                     # Catch count option
                     if cmdlist[1] == "-c":
                         print("count argument")
