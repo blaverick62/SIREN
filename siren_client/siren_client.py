@@ -68,7 +68,7 @@ class telnetClientThread(threading.Thread):
                             path = spl.join(pathlist)
                         else:
                             path = pathlist[0]
-                        if path[0] != spl:
+                        if path[0] != spl and ver == "L":
                             path = spl + path
                         #if ver == "W":
                         #    path = "C:" + path
