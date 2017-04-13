@@ -236,12 +236,20 @@ class ssh_thread(threading.Thread):
                 while self.chan.recv_ready() == False:
                     pass
                 # Build input string until enter character is found
+                i = 0
                 while '\r' not in data:
                     rec = self.chan.recv(256)
-                    if ord(rec) == 8:
-                        data = data[:-1]
-                        self.chan.send(chr(8))
+                    print("Character caught: " + rec + ", " + str(ord(rec)))
+                    if ord(rec) == 127:
+                        if i > 0:
+                            i -= 1
+                            data = data[:-1]
+                            print("Backspace caught: " + rec)
+                            self.chan.send(chr(8)+' '+chr(8))
+                        else:
+                            self.chan.send('')
                     else:
+                        i += 1
                         data = data + rec
                         self.chan.send(rec)
                 self.chan.send('\n')
