@@ -60,7 +60,8 @@ class telnetClientThread(threading.Thread):
                     if cmdlist[1] == "..":
                         # Split path and remove last element of array to get parent
                         pathlist = path.split(spl)
-                        pathlist = pathlist[1:]
+                        if ver == "L":
+                            pathlist = pathlist[1:]
                         if len(pathlist) > 1:
                             pathlist = pathlist[:-1]
                         if len(pathlist) > 1:
@@ -69,8 +70,8 @@ class telnetClientThread(threading.Thread):
                             path = pathlist[0]
                         if path[0] != spl:
                             path = spl + path
-                        if ver == "W":
-                            path = "C:" + path
+                        #if ver == "W":
+                        #    path = "C:" + path
                         self.conn.send(path + ";")
                     # Do nothing for current
                     elif cmdlist[1] == ".":
