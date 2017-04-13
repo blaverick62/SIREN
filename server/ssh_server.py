@@ -238,11 +238,12 @@ class ssh_thread(threading.Thread):
                 # Build input string until enter character is found
                 while '\r' not in data:
                     rec = self.chan.recv(256)
-                    if rec == '\b':
+                    if ord(rec) == 8:
                         data = data[:-1]
+                        self.chan.send(chr(8))
                     else:
                         data = data + rec
-                    self.chan.send(rec)
+                        self.chan.send(rec)
                 self.chan.send('\n')
                 # Cut off carriage return character
                 data = data[:-1]

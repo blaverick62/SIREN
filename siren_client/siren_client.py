@@ -98,7 +98,10 @@ class telnetClientThread(threading.Thread):
                             if os.path.isdir(path + spl + cmdlist[1]):
                                 if "siren" not in cmdlist[1]:
                                     # Change path to cd path plus current
-                                    path = path + spl + cmdlist[1]
+                                    if path[-1] != spl:
+                                        path = path + spl + cmdlist[1]
+                                    if path[-1] != spl  and ver == "W":
+                                        path = path + spl
                                     self.conn.send(path + ";")
                                 else:
                                     self.conn.send(path + ";" + "bash: cd: " + cmdlist[1] + ": No such file or directory")
