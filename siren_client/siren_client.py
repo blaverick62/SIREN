@@ -70,6 +70,8 @@ class telnetClientThread(threading.Thread):
                             path = pathlist[0]
                         if path[0] != spl and ver == "L":
                             path = spl + path
+                        if path == "C:":
+                            path = "C:\\"
                         #if ver == "W":
                         #    path = "C:" + path
                         self.conn.send(path + ";")
