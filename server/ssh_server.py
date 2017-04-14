@@ -14,6 +14,7 @@
 from binascii import hexlify
 import netifaces as ni
 from time import sleep
+from subprocess import Popen, PIPE, STDOUT
 
 import base64, datetime, threading, socket, traceback, sys, paramiko, ConfigParser
 from paramiko.py3compat import u
@@ -258,8 +259,9 @@ class ssh_thread(threading.Thread):
                 if data == "exit":
                     # End sockets and log end time
                     if len(hist) > 1:
-                        tty = hist[-1][1]
-                        sel = hist[-1][0]
+                        tty = hist[-2][1]
+                        sel = hist[-2][0]
+                        hist = hist[:-1]
                         self.detsel = sel
                         self.linsock.send("TERMINATE")
                         self.linsock.close()
@@ -477,7 +479,16 @@ class ssh_thread(threading.Thread):
                     self.logsock.send("INPUT;{};{};{}".format(self.starttime, timestmp, data))
                     # If sent command is netstat, send IP address as well
                     # Send command to the detonation chamber for processing
-                    if data.split()[0] == "netstat":
+
+                    if data.split()[0] == "ifconfig" and self.detsel == 0:
+                        proc = Popen("ifconfig", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                        chanresponse = proc.stdout.read()
+                        chanresponse = '\r\n'.join(resplist[1].split('\n'))
+                        if chanresponse[-2:] != "\r\n":
+                            chanresponse = chanresponse + '\r\n'
+                        self.chan.send(chanresponse)
+                        continue
+                    elif data.split()[0] == "netstat":
                         self.linsock.sendall("netstat " + ip)
                     else:
                         self.linsock.sendall(data)
@@ -487,6 +498,9 @@ class ssh_thread(threading.Thread):
                         print("Detonation chamber timed out: " + str(e))
                         traceback.print_exc()
                         sys.exit(1)
+
+
+
                     # Chamber sends back path;response, unpackage the message
                     resplist = response.split(";")
                     path = resplist[0]
