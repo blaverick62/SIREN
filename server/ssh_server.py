@@ -483,12 +483,13 @@ class ssh_thread(threading.Thread):
                     if data.split()[0] == "ifconfig" and self.detsel == 0:
                         proc = Popen("ifconfig", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
                         chanresponse = proc.stdout.read()
-                        chanresponse = '\r\n'.join(resplist[1].split('\n'))
+                        chanresponse = '\r\n'.join(chanresponse.split('\n'))
                         if chanresponse[-2:] != "\r\n":
                             chanresponse = chanresponse + '\r\n'
                         self.chan.send(chanresponse)
                         continue
-                    elif data.split()[0] == "netstat":
+
+                    if data.split()[0] == "netstat":
                         self.linsock.sendall("netstat " + ip)
                     else:
                         self.linsock.sendall(data)
@@ -498,6 +499,7 @@ class ssh_thread(threading.Thread):
                         print("Detonation chamber timed out: " + str(e))
                         traceback.print_exc()
                         sys.exit(1)
+
 
 
 
