@@ -240,7 +240,6 @@ class ssh_thread(threading.Thread):
                 i = 0
                 while '\r' not in data:
                     rec = self.chan.recv(256)
-                    print("Character caught: " + rec + ", " + str(ord(rec)))
                     if ord(rec) == 127:
                         if i > 0:
                             i -= 1
@@ -297,6 +296,7 @@ class ssh_thread(threading.Thread):
                         sshuser = addrarray[0]
                         sel = -1
                         # Check if target is in the network
+                        print(self.detaddrs)
                         for ind in range(len(self.detaddrs)):
                             if sshaddr == self.detaddrs[ind]:
                                 sel = ind
