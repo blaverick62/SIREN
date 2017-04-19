@@ -211,17 +211,20 @@ class telnetClientThread(threading.Thread):
 config = ConfigParser.ConfigParser()
 config.read('../docs/siren.cfg')
 users = config.get('Detonation Chamber', 'user').split(',')
+control = config.get('SIREN Control', 'host')
 # Listen on port 23
 try:
     import termios
     ver = "L"
+    proc = Popen("iptables -F", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+    print(proc.stdout.read())
+    proc = Popen("iptables -P FORWARD DROP; iptables -A INPUT -m state --state INVALID -j DROP; iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT; iptables -A INPUT -i lo -j ACCEPT; iptables -A INPUT -s " + control + " -j ACCEPT; iptables -P INPUT DROP", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+    print(proc.stdout.read())
+    user = users[0]
 except ImportError:
     ver = "W"
-
-if ver == "L":
-    user = users[0]
-else:
     user = users[1]
+
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 telsock.bind(('', 23))
 telsock.listen(5)
