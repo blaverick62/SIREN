@@ -224,7 +224,6 @@ try:
 except ImportError:
     ver = "W"
     user = users[1]
-
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 telsock.bind(('', 23))
 telsock.listen(5)
