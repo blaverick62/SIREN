@@ -554,6 +554,7 @@ class ssh_ctrl(threading.Thread):
         self.pubkey = pubkey
         config = ConfigParser.ConfigParser()
         config.read('docs/siren.cfg')
+        # Pull interfaces, detonation chamber addresses and users from config
         self.iface = config.get('Interfaces', 'interface')
         self.detaddrs = config.get('Detonation Chamber', 'host').split(',')
         self.detusers = config.get('Detonation Chamber', 'user').split(',')
@@ -565,7 +566,9 @@ class ssh_ctrl(threading.Thread):
             print("SSH bind failed " + str(e))
             traceback.print_exc()
             sys.exit(1)
+        # Find IP address of chosen NIC
         print("SSH server at " + ni.ifaddresses(self.iface)[2][0]['addr'])
+
 
 
     def run(self):
