@@ -362,6 +362,14 @@ $(document).ready(function(){
             //***************************************************************
             // Snort Event Log
             //***************************************************************
+            function intToIP(int) {
+                var part1 = int & 255;
+                var part2 = ((int >> 8) & 255);
+                var part3 = ((int >> 16) & 255);
+                var part4 = ((int >> 24) & 255);
+
+                return part4 + "." + part3 + "." + part2 + "." + part1;
+            }
             var eventsrcips = [];
             var eventdstips = [];
             var eventsigs = [];
@@ -377,8 +385,8 @@ $(document).ready(function(){
                 for(j=0; j<snortips.length; j++){
                     if(snortevents[i][0] == snortips[j][0]){
                         if(snortevents[i][1] == snortips[j][1]){
-                            eventsrcips.push(snortips[j][2])
-                            eventdstips.push(snortips[j][3])
+                            eventsrcips.push(intToIP(snortips[j][2]))
+                            eventdstips.push(intToIP(snortips[j][3]))
                         }
                     }
                 }
