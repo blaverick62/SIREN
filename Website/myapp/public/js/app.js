@@ -388,6 +388,10 @@ $(document).ready(function(){
                 }
                 eventtime.push(snortevents[i][3])
             }
+            console.log(eventtime)
+            console.log(eventsigs)
+            console.log(eventsrcips)
+            console.log(eventdstips)
 
             for(i = 0; i < eventtime.length; i++){
                 eventlist = "<tr><td>"+eventsrcips[i]+"</td><td>"+eventdstips[i]+"</td><td>"+eventsigs[i]+"</td><td>"+eventtime[i]+"</td></tr>";
