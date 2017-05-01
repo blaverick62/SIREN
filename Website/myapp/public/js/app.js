@@ -355,7 +355,7 @@ $(document).ready(function(){
 
             var cmdlist = "";
             for(i = 0; i < commands.length; i++){
-                cmdlist = "<tr><td>"+commands[i]+"</td><td>"+cmdips[i]+"</td><td>"+cmddests[i]+"</td><td>"+cmdprotocols[i]+"</td><td>"+cmdlocports[i]+"</td><td>"+cmdremports[i]+"</td><td>"+cmdtimes[i]+"</td></tr>";
+                cmdlist = cmdlist + "<tr><td>"+commands[i]+"</td><td>"+cmdips[i]+"</td><td>"+cmddests[i]+"</td><td>"+cmdprotocols[i]+"</td><td>"+cmdlocports[i]+"</td><td>"+cmdremports[i]+"</td><td>"+cmdtimes[i]+"</td></tr>";
             }
             $('#input').html(cmdlist);
 
@@ -394,8 +394,9 @@ $(document).ready(function(){
             console.log(eventsrcips)
             console.log(eventdstips)
 
+            var eventlist = ""
             for(i = 0; i < eventtime.length; i++){
-                eventlist = "<tr><td>"+eventsrcips[i]+"</td><td>"+eventdstips[i]+"</td><td>"+eventsigs[i]+"</td><td>"+eventtime[i]+"</td></tr>";
+                eventlist = eventlist + "<tr><td>"+eventsrcips[i]+"</td><td>"+eventdstips[i]+"</td><td>"+eventsigs[i]+"</td><td>"+eventtime[i]+"</td></tr>";
             }
             $('#event').html(eventlist);
 
