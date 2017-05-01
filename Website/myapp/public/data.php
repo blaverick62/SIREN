@@ -194,6 +194,56 @@ if ($result=mysqli_query($conn,$querygeo))
 
 //$resultpass = $conn->query($querypass);
 
+$conn->close();
+
+$servername = "sirendb";
+$username = "sirenlocal";
+$password = "sirenproj";
+$db_name = "snort";
+// Create connection
+$conn = new mysqli($servername, $username, $password, $db_name);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$querysnortevent = sprintf("SELECT * FROM event;");
+$datasnortevent = array();
+if ($result=mysqli_query($conn,$querysnortevent))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $datasnortevent[] = $row;
+    }
+  // Free result set
+    mysqli_free_result($result);
+}
+
+$querysnortsig = sprintf("SELECT * FROM signature;");
+$datasnortsig = array();
+if ($result=mysqli_query($conn,$querysnortsig))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $datasnortsig[] = $row;
+    }
+  // Free result set
+    mysqli_free_result($result);
+}
+
+$querysnortip = sprintf("SELECT * FROM iphdr;");
+$datasnortip = array();
+if ($result=mysqli_query($conn,$querysnortip))
+    {
+  // Fetch one and one row
+    while ($row=mysqli_fetch_row($result)){
+        $datasnortip[] = $row;
+    }
+  // Free result set
+    mysqli_free_result($result);
+}
+
 $usernames = json_encode($data);
 $passwords = json_encode($datapass);
 $successes = json_encode($datasucc);
@@ -209,6 +259,9 @@ $protocol = json_encode($dataprot);
 $localport = json_encode($datasrc);
 $remoteport = json_encode($datarem);
 $geodata = json_encode($datageo);
+$snortevent = json_encode($datasnortevent);
+$snortsig = json_encode($datasnortsig);
+$snortip = json_encode($datasnortip);
 
 $dataout = array();
 $dataout[0] = $usernames;
@@ -226,6 +279,9 @@ $dataout[11] = $protocol;
 $dataout[12] = $localport;
 $dataout[13] = $remoteport;
 $dataout[14] = $geodata;
+$dataout[15] = $snortevent;
+$dataout[16] = $snortsig;
+$dataout[17] = $snortip;
 
 echo json_encode($dataout);
 

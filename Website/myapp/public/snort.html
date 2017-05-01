@@ -25,27 +25,24 @@
     <div class="topnav">
         <ul>
             <li ><a href="index.html">Simple View</a> </li>
-            <li class="active"><a href="pages/index.html">Advanced View</a></li>
-			<li ><a href="snort.html">Snort</a></li>
+            <li ><a href="advanced.html">Advanced View</a></li>
+            <li class="active"><a href="snort.html">Snort</a></li>
         </ul>
 	</div>
 	<div class="overarch">
 		<div class="chart-container">
-			<div id="command-list">
-				<h1 id="table-label">Master Table</h1>
+			<div id="snort-events">
+				<h1 id="table-label">Snort Events</h1>
 				<table>
 					<thead>
 						<tr>
-							<th>Command</th>
 							<th>Source IP Address</th>
 							<th>Destination IP Address</th>
-							<th>Protocol</th>
-							<th>Local Port</th>
-							<th>Remote Port</th>
+							<th>Event</th>
 							<th>Time Stamp</th>
 						</tr>
 					</thead>
-					<tbody id="input"></tbody>
+					<tbody id="event"></tbody>
 				</table>
 
 			</div>

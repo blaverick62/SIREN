@@ -30,6 +30,9 @@ $(document).ready(function(){
             var localports = JSON.parse(data[12]);
             var remoteports = JSON.parse(data[13]);
             var geodata = JSON.parse(data[14]);
+            var snortevents = JSON.parse(data[15]);
+            var snortsigs = JSON.parse(data[16]);
+            var snortips = JSON.parse(data[17]);
 
             console.log(geodata[0])
 
@@ -356,6 +359,35 @@ $(document).ready(function(){
             }
             $('#input').html(cmdlist);
 
+            //***************************************************************
+            // Snort Event Log
+            //***************************************************************
+            var eventsrcips = [];
+            var eventdstips = [];
+            var eventsigs = [];
+            var eventtime = [];
+
+            for(i=0; i<snortevents.length; i++){
+                for(j=0; j<snortips.length; j++){
+                    if(snortevents[i][0] == snortips[j][0] && snortevents[i][1] == snortips[j][1]){
+                        eventsrcips.push(snortips[j][2])
+                        eventdstips.push(snortips[j][3])
+                        break;
+                    }
+                }
+                for(j=0; j<snortsigs.length; j++){
+                    if(snortevents[i][0] == snortsigs[j][0]){
+                        eventsigs.push(snortsigs[j][1])
+                        break;
+                    }
+                }
+                eventtime.push(snortevents[i][3])
+            }
+
+            for(i = 0; i < eventtime.length; i++){
+                eventlist = "<tr><td>"+eventsrcips[i]+"</td><td>"+eventdstips[i]+"</td><td>"+eventsigs[i]+"</td><td>"+eventtime[i]+"</td></tr>";
+            }
+            $('event').html(eventlist);
 
             //***************************************************
             // Password Percentage Chart
