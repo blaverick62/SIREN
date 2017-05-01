@@ -366,7 +366,12 @@ $(document).ready(function(){
             var eventdstips = [];
             var eventsigs = [];
             var eventtime = [];
-
+            console.log("Snort events")
+            console.log(snortevents)
+            console.log("Snort Signatures")
+            console.log(snortsigs)
+            console.log("Snort IPs")
+            console.log(snortips)
             for(i=0; i<snortevents.length; i++){
                 for(j=0; j<snortips.length; j++){
                     if(snortevents[i][0] == snortips[j][0] && snortevents[i][1] == snortips[j][1]){
@@ -387,7 +392,7 @@ $(document).ready(function(){
             for(i = 0; i < eventtime.length; i++){
                 eventlist = "<tr><td>"+eventsrcips[i]+"</td><td>"+eventdstips[i]+"</td><td>"+eventsigs[i]+"</td><td>"+eventtime[i]+"</td></tr>";
             }
-            $('event').html(eventlist);
+            $('#event').html(eventlist);
 
             //***************************************************
             // Password Percentage Chart
