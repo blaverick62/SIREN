@@ -382,7 +382,7 @@ $(document).ready(function(){
                     }
                 }
                 for(j=0; j<snortsigs.length; j++){
-                    if(snortevents[i][0] == snortsigs[j][0]){
+                    if(snortevents[i][3] == snortsigs[j][0]){
                         eventsigs.push(snortsigs[j][1])
                     }
                 }
