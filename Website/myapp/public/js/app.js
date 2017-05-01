@@ -374,16 +374,16 @@ $(document).ready(function(){
             console.log(snortips)
             for(i=0; i<snortevents.length; i++){
                 for(j=0; j<snortips.length; j++){
-                    if(snortevents[i][0] == snortips[j][0] && snortevents[i][1] == snortips[j][1]){
-                        eventsrcips.push(snortips[j][2])
-                        eventdstips.push(snortips[j][3])
-                        break;
+                    if(snortevents[i][0] == snortips[j][0]){
+                        if(snortevents[i][1] == snortips[j][1]){
+                            eventsrcips.push(snortips[j][2])
+                            eventdstips.push(snortips[j][3])
+                        }
                     }
                 }
                 for(j=0; j<snortsigs.length; j++){
                     if(snortevents[i][0] == snortsigs[j][0]){
                         eventsigs.push(snortsigs[j][1])
-                        break;
                     }
                 }
                 eventtime.push(snortevents[i][3])
