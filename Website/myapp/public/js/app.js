@@ -382,7 +382,9 @@ $(document).ready(function(){
                         }
                     }
                 }
+                console.log(snortevents[i][2])
                 for(k=0; k<snortsigs.length; k++){
+                    console.log(snortsigs[k][6])
                     if(snortevents[i][2] == snortsigs[k][6]){
                         eventsigs.push(snortsigs[k][1])
                     }
