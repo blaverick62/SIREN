@@ -369,8 +369,8 @@ $(document).ready(function(){
             console.log("Snort events")
             console.log(snortevents)
             console.log("Snort Signatures")
-            console.log(snortsigs[0])
-            console.log(snortevents[0])
+            console.log(snortsigs[0][3])
+            console.log(snortevents[0][6])
             console.log("Snort IPs")
             console.log(snortips)
             for(i=0; i<snortevents.length; i++){
