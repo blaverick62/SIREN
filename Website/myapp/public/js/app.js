@@ -370,7 +370,7 @@ $(document).ready(function(){
             console.log(snortevents)
             console.log("Snort Signatures")
             console.log(snortsigs[0][6])
-            console.log(snortevents[0][3])
+            console.log(snortevents[0][2])
             console.log("Snort IPs")
             console.log(snortips)
             for(i=0; i<snortevents.length; i++){
@@ -383,7 +383,7 @@ $(document).ready(function(){
                     }
                 }
                 for(j=0; j<snortsigs.length; j++){
-                    if(snortevents[i][3] == snortsigs[j][6]){
+                    if(snortevents[i][2] == snortsigs[j][6]){
                         eventsigs.push(snortsigs[j][1])
                     }
                 }
