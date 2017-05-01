@@ -382,9 +382,9 @@ $(document).ready(function(){
                         }
                     }
                 }
-                for(j=0; j<snortsigs.length; j++){
-                    if(snortevents[i][2] == snortsigs[j][6]){
-                        eventsigs.push(snortsigs[j][1])
+                for(k=0; k<snortsigs.length; k++){
+                    if(snortevents[i][2] == snortsigs[k][6]){
+                        eventsigs.push(snortsigs[k][1])
                     }
                 }
                 eventtime.push(snortevents[i][3])
