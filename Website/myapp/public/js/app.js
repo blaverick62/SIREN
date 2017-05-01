@@ -369,7 +369,7 @@ $(document).ready(function(){
             console.log("Snort events")
             console.log(snortevents)
             console.log("Snort Signatures")
-            console.log(snortsigs[0][6])
+            console.log(snortsigs[0][0])
             console.log(snortevents[0][2])
             console.log("Snort IPs")
             console.log(snortips)
@@ -382,10 +382,8 @@ $(document).ready(function(){
                         }
                     }
                 }
-                console.log(snortevents[i][2])
                 for(k=0; k<snortsigs.length; k++){
-                    console.log(snortsigs[k][6])
-                    if(snortevents[i][2] == snortsigs[k][6]){
+                    if(snortevents[i][2] == snortsigs[k][0]){
                         eventsigs.push(snortsigs[k][1])
                     }
                 }
