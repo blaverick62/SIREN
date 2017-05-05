@@ -115,7 +115,7 @@ class telnetClientThread(threading.Thread):
                     self.conn.send(path + ";" + falsepass)
                 # Catch sudo and let them know that's not cool
                 elif (cmdlist[0] == "sudo" or cmdlist[0] == "su") and ver == "L":
-                    self.conn.send(path + ";" + "lol yeah nah m8 ill fuckin nip ya")
+                    self.conn.send(path + ";" + "no")
                 # Check for netstat
                 elif cmdlist[0] == "netstat":
                     # Print back dynamic active connections and static UDP connections
